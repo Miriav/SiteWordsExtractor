@@ -26,6 +26,9 @@ namespace SiteWordsExtractor
         // delegate for passing the counters as parameters
         delegate void CoutnersParametersDelegate(int linksFound, int linksVisited, int linksSkipped);
 
+        // delegate for updating the list view
+        delegate void UpdateListViewDelegate(string url, int wordsCount, string filename);
+
         #endregion // Delegates
 
         #region Constants
@@ -35,6 +38,8 @@ namespace SiteWordsExtractor
 
         #endregion // Constants
 
+        #region Data Members
+        
         AppSettings m_appSettings;
         string m_statsRootFolder;
         string m_reportFolder;
@@ -43,8 +48,10 @@ namespace SiteWordsExtractor
         List<string> m_scrappedNodesList;
         List<string> m_rippedAttributesList;
 
-        #region Counters
+        #endregion
         
+        #region Counters
+
         private int m_linksFound;
         private int m_linksVisited;
         private int m_linksSkipped;
@@ -183,55 +190,21 @@ namespace SiteWordsExtractor
 
         private void processCrawledPage(CrawledPage crawledPage)
         {
-            string url = crawledPage.Uri.AbsoluteUri.ToString();
+            Uri uri = crawledPage.Uri;
+            string url = uri.AbsoluteUri.ToString();
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
             HtmlAgilityPack.HtmlNode root = htmlDoc.DocumentNode;
 
-            Html2Text html2Text = new Html2Text();
+            Html2Text html2Text = new Html2Text(m_scrappedNodesList, m_rippedAttributesList);
             string htmlString = html2Text.ConvertHtml(htmlDoc);
             Log(htmlString);
-            /*
-            List<string> paragraphs = new List<string>();
-            foreach (HtmlAgilityPack.HtmlNode node in root.SelectNodes("//text()[not(parent::script)]"))
-            {
-                bool bScrapped = false;
-                foreach (string tagName in m_scrappedNodesList)
-                {
-                    if (String.Equals(node.ParentNode.Name, tagName, StringComparison.OrdinalIgnoreCase))
-                    //if (node.ParentNode.Name == tagName)
-                    {
-                        bScrapped = true;
-                        break;
-                    }
-                }
-                if (bScrapped)
-                {
-                    continue;
-                }
 
-                string nodeText = node.InnerText.Trim();
-                if (!String.IsNullOrWhiteSpace(nodeText))
-                {
-                    Log("TEXT: " + nodeText);
-                }
-                else
-                {
-                    continue;
-                }
+            int wordsCount = WordsCounter.CountWords(htmlString, m_appSettings.wordRegex);
+            Log("Found " + wordsCount.ToString() + " words in the page");
 
-                foreach (HtmlAgilityPack.HtmlAttribute attribute in node.Attributes)
-                {
-                    foreach (string attName in m_rippedAttributesList)
-                    {
-                        if (String.Equals(attName, attribute.Name, StringComparison.OrdinalIgnoreCase))
-                        //if (attribute.Name == attName)
-                        {
-                            Log("[" + attName + ": " + attribute.Value + "]");
-                        }
-                    }
-                }
-            }
-            */
+            string filename = buildFileNameFromUrl(uri);
+
+            updateListView(url, wordsCount, filename);
         }
         
         #region Crawler Callbacks
@@ -297,7 +270,7 @@ namespace SiteWordsExtractor
 
         #endregion // Crawler Callbacks
 
-        #region Folders
+        #region Files and Folders
         private void createStatsSubFolder()
         {
             buildStatsFolderPathName();
@@ -383,6 +356,17 @@ namespace SiteWordsExtractor
 
             return true;
         }
+
+        private string buildFileNameFromUrl(Uri url, string ext = ".txt")
+        {
+            string filename = "";
+
+            filename = url.PathAndQuery;
+            filename = String.Join(".", filename.Split('/'));
+            filename += ext;
+
+            return filename;
+        }
         #endregion // Folders
 
         #region UI Update
@@ -457,6 +441,20 @@ namespace SiteWordsExtractor
             settingsButton.Enabled = true;
 
             updateStatusLine("Crawling finished");
+        }
+
+        private void updateListView(string url, int wordsCount, string filename)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new UpdateListViewDelegate(updateListView), url, wordsCount, filename);
+                return;
+            }
+
+            ListViewItem item = new ListViewItem(url);
+            item.SubItems.Add(wordsCount.ToString());
+            item.SubItems.Add(filename);
+            listViewResults.Items.Add(item);
         }
 
         #endregion // UI Update

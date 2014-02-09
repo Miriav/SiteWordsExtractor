@@ -28,6 +28,9 @@ namespace SiteWordsExtractor
         // List of HTML tags to extract (default is ALT, TITLE).
         public string attributes = "alt,title";
 
+        // regular expression to be used when counting words in a page
+        public string wordRegex = @"[\S]+";
+
         #endregion
 
         #region Crawler Settings
@@ -50,48 +53,6 @@ namespace SiteWordsExtractor
 
 
         #endregion
-        /*
-        // Application version
-        private string version = "1.0";
-        public string Version
-        {
-            get { return version; }
-        }
 
-        // default site URL
-        private string siteURL = "";
-        public string SiteURL
-        {
-            get { return siteURL; }
-            set { siteURL = value; }
-        }
-
-#region Crawler Settings
-
-        // maximum number of pages to browse
-        private int maxPagesToCrawl = 9999;
-        public int MaxPagesToCrawl
-        {
-            get { return maxPagesToCrawl; }
-            set { maxPagesToCrawl = value; }
-        }
-
-        // HTTP timeout in seconds
-        private int httpTimeoutSec = 15;
-        public int HTTPTimeoutSec
-        {
-            get { return httpTimeoutSec; }
-            set { httpTimeoutSec = value; }
-        }
-
-        // Maximum number of allowed redirects
-        private int maxRedirects = 7;
-        public int MaxRedirects
-        {
-            get { return maxRedirects; }
-            set { maxRedirects = value; }
-        }
-#endregion
-         */
     }
 }

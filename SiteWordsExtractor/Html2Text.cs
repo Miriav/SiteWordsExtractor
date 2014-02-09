@@ -10,6 +10,14 @@ namespace SiteWordsExtractor
 {
     class Html2Text
     {
+        List<string> m_scrappedTags;
+        List<string> m_rippedAttributes;
+
+        public Html2Text(List<string> scrappedTags, List<string> rippedAtts)
+        {
+            m_scrappedTags = scrappedTags;
+            m_rippedAttributes = rippedAtts;
+        }
 
         public string Convert(string path)
         {
@@ -39,7 +47,7 @@ namespace SiteWordsExtractor
             ConvertTo(doc.DocumentNode, sw);
             string htmlText = sw.ToString();
 
-            // cleanup the result be removing empty lines
+            // cleanup the result by removing empty lines
             StringReader sr = new StringReader(htmlText);
             StringWriter result = new StringWriter();
             string line = string.Empty;
@@ -77,6 +85,17 @@ namespace SiteWordsExtractor
                 case HtmlNodeType.Text:
                     // script and style must not be output
                     string parentName = node.ParentNode.Name;
+                    bool bScrapped = false;
+                    foreach (string tagName in m_scrappedTags)
+                    {
+                        if (parentName == tagName)
+                        {
+                            bScrapped = true;
+                        }
+                    }
+                    if (bScrapped == true)
+                        break;
+
                     if ((parentName == "script") || (parentName == "style"))
                         break;
 
@@ -116,17 +135,14 @@ namespace SiteWordsExtractor
             foreach (HtmlNode subnode in node.ChildNodes)
             {
                 // check for attributes
-                HtmlAttribute att = null;
-                att = subnode.Attributes["alt"];
-                if (att != null)
+                foreach (string attName in m_rippedAttributes)
                 {
-                    outText.WriteLine("[ALT: " + att.Value + "]");
-                }
-
-                att = subnode.Attributes["title"];
-                if (att != null)
-                {
-                    outText.WriteLine("[TITLE: " + att.Value + "]");
+                    HtmlAttribute att = null;
+                    att = subnode.Attributes[attName];
+                    if (att != null)
+                    {
+                        outText.WriteLine("[" + attName + ": " + att.Value + "]");
+                    }
                 }
 
                 ConvertTo(subnode, outText);
