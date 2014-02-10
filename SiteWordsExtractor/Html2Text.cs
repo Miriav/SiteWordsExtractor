@@ -12,13 +12,16 @@ namespace SiteWordsExtractor
     {
         List<string> m_scrappedTags;
         List<string> m_rippedAttributes;
+        RtfPageFile m_rtf;
 
-        public Html2Text(List<string> scrappedTags, List<string> rippedAtts)
+        public Html2Text(string rtfFilename, List<string> scrappedTags, List<string> rippedAtts)
         {
             m_scrappedTags = scrappedTags;
             m_rippedAttributes = rippedAtts;
+            m_rtf = new RtfPageFile(rtfFilename);
         }
 
+        /*
         public string Convert(string path)
         {
             HtmlDocument doc = new HtmlDocument();
@@ -40,12 +43,17 @@ namespace SiteWordsExtractor
             sw.Flush();
             return sw.ToString();
         }
+        */
 
-        public string ConvertHtml(HtmlDocument doc)
+        public string ConvertHtml(string url, HtmlDocument doc)
         {
+            m_rtf.AddHyperlink(url);
+
             StringWriter sw = new StringWriter();
             ConvertTo(doc.DocumentNode, sw);
             string htmlText = sw.ToString();
+
+            m_rtf.saveRtf();
 
             // cleanup the result by removing empty lines
             StringReader sr = new StringReader(htmlText);
@@ -110,6 +118,7 @@ namespace SiteWordsExtractor
                     if (html.Trim().Length > 0)
                     {
                         outText.Write(HtmlEntity.DeEntitize(html));
+                        m_rtf.AppendHtmlElement(HtmlEntity.DeEntitize(html));
                     }
                     break;
 
@@ -142,6 +151,7 @@ namespace SiteWordsExtractor
                     if (att != null)
                     {
                         outText.WriteLine("[" + attName + ": " + att.Value + "]");
+                        m_rtf.AppendHtmlAttribute("\"" + attName + "\":" + att.Value);
                     }
                 }
 

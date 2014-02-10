@@ -195,19 +195,20 @@ namespace SiteWordsExtractor
         {
             Uri uri = crawledPage.Uri;
             string url = uri.AbsoluteUri.ToString();
+            string rtfFilename = buildFileNameFromUrl(uri, ".rtf");
+            string rtfFilepath = m_statsRootFolder + "/" + rtfFilename;
+
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
             HtmlAgilityPack.HtmlNode root = htmlDoc.DocumentNode;
 
-            Html2Text html2Text = new Html2Text(m_scrappedNodesList, m_rippedAttributesList);
-            string htmlString = html2Text.ConvertHtml(htmlDoc);
-            Log(htmlString);
+            Html2Text html2Text = new Html2Text(rtfFilepath, m_scrappedNodesList, m_rippedAttributesList);
+            string htmlString = html2Text.ConvertHtml(url, htmlDoc);
+            //Log(htmlString);
 
             int wordsCount = WordsCounter.CountWords(htmlString, m_appSettings.wordRegex);
-            Log("Found " + wordsCount.ToString() + " words in the page");
+            Log("Found " + wordsCount.ToString() + " words in page: " + url);
 
-            string filename = buildFileNameFromUrl(uri);
-
-            updateListView(url, wordsCount, filename);
+            updateListView(url, wordsCount, rtfFilename);
         }
         
         #region Crawler Callbacks
@@ -345,7 +346,6 @@ namespace SiteWordsExtractor
                 // check if folder already exists
                 if (Directory.Exists(folderFullPath))
                 {
-                    LogWrn("Folder " + folderFullPath + " already exists");
                     return true;
                 }
 
@@ -353,7 +353,7 @@ namespace SiteWordsExtractor
             }
             catch (Exception e)
             {
-                LogErr("Failed to create folder " + folderFullPath + ": " + e.ToString());
+                Console.WriteLine("Failed to create folder " + folderFullPath + ": " + e.ToString());
                 return false;
             }
 
@@ -365,7 +365,21 @@ namespace SiteWordsExtractor
             string filename = "";
 
             filename = url.PathAndQuery;
+            // remove prefixed "/"
+            if (filename.StartsWith("/"))
+            {
+                filename = filename.Remove(0, 1);
+            }
             filename = String.Join(".", filename.Split('/'));
+            filename = filename.Replace('\\', '.');
+            filename = filename.Replace('/', '.');
+            filename = filename.Replace(':', '=');
+            filename = filename.Replace('*', '.');
+            filename = filename.Replace('"', '\'');
+            filename = filename.Replace('<', 'E');
+            filename = filename.Replace('>', '3');
+            filename = filename.Replace('|', '!');
+            filename = filename.Replace('?', '-');
             filename += ext;
 
             return filename;
@@ -437,8 +451,10 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            progressBar.Value = progressBar.Maximum;
+            //progressBar.Value = progressBar.Maximum;
+            progressBar.Value = progressBar.Minimum;
             progressBar.Enabled = false;
+            progressLabel.Text += " Finished!";
             siteURL.Enabled = true;
             goButton.Enabled = true;
             settingsButton.Enabled = true;
@@ -488,6 +504,10 @@ namespace SiteWordsExtractor
                 return;
             }
 
+            if (m_simpleLogger == null)
+            {
+                createLogFile();
+            }
             m_simpleLogger.Log(msg);
         }
 

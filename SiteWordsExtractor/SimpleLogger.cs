@@ -51,7 +51,7 @@ namespace SiteWordsExtractor
             if (m_logger != null)
             {
                 string timestamp = DateTime.Now.ToString("[HH:mm:ss] ");
-                m_logger.WriteLine(prefix + timestamp + msg);
+                m_logger.WriteLineAsync(prefix + timestamp + msg);
             }
         }
 
