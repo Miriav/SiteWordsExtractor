@@ -112,6 +112,7 @@
             // url
             // 
             this.url.Text = "url";
+            this.url.Width = 180;
             // 
             // words
             // 
@@ -120,6 +121,7 @@
             // filepath
             // 
             this.filepath.Text = "File Path";
+            this.filepath.Width = 180;
             // 
             // statusStrip1
             // 

@@ -43,10 +43,10 @@ namespace SiteWordsExtractor
         AppSettings m_appSettings;
         string m_statsRootFolder;
         string m_reportFolder;
-        StreamWriter m_logger;
         BackgroundWorker m_backgroundWorker;
         List<string> m_scrappedNodesList;
         List<string> m_rippedAttributesList;
+        SimpleLogger m_simpleLogger;
 
         #endregion
         
@@ -67,16 +67,9 @@ namespace SiteWordsExtractor
             progressLabel.Text = "";
             m_statsRootFolder = null;
             m_reportFolder = null;
-            m_logger = null;
+            m_simpleLogger = null;
 
-            m_scrappedNodesList = new List<string>();
-            m_scrappedNodesList.Add("script");
-            m_scrappedNodesList.Add("style");
-            m_scrappedNodesList.Add("#comment");
-
-            m_rippedAttributesList = new List<string>();
-            m_rippedAttributesList.Add("alt");
-            m_rippedAttributesList.Add("title");
+            validateSettings();
         }
 
         private void settingsButton_Click(object sender, EventArgs e)
@@ -88,9 +81,16 @@ namespace SiteWordsExtractor
             if (result == DialogResult.OK)
             {
                 m_appSettings = settingsDlg.GetAppSettings();
-                AppSettingsStorage.Save(m_appSettings);
-                siteURL.Text = m_appSettings.defaultUrl;
-                updateStatusLine("Configuration Saved");
+                if (validateSettings())
+                {
+                    AppSettingsStorage.Save(m_appSettings);
+                    siteURL.Text = m_appSettings.defaultUrl;
+                    updateStatusLine("Configuration Saved");
+                }
+                else
+                {
+                    updateStatusLine("Failed to validate settings");
+                }
             }
         }
 
@@ -118,6 +118,10 @@ namespace SiteWordsExtractor
         private bool validateSettings()
         {
             // TODO: validate settings
+
+            m_scrappedNodesList = new List<string>(m_appSettings.scrappedHTMLTags.Split(','));
+            m_rippedAttributesList = new List<string>(m_appSettings.attributes.Split(','));
+
             return true;
         }
 
@@ -148,7 +152,7 @@ namespace SiteWordsExtractor
         private void done()
         {
             // close log file
-            closeLogFile();
+            m_simpleLogger.closeLogFile();
         }
 
         private void doWork(object sender, DoWorkEventArgs e)
@@ -182,7 +186,6 @@ namespace SiteWordsExtractor
 
             string elapsedTimeStr = crawlerResult.Elapsed.ToString(@"dd\.hh\:mm\:ss");
             Log("*** Crawling completed. Elapsed time: " + elapsedTimeStr);
-            m_logger.Flush();
             
             updateCrawlingFinished();
             done();
@@ -397,7 +400,7 @@ namespace SiteWordsExtractor
             progressBar.Minimum = 0;
             progressBar.Value = 0;
             progressBar.Enabled = true;
-            listViewResults.Clear();
+            listViewResults.Items.Clear();
             siteURL.Enabled = false;
             goButton.Enabled = false;
             settingsButton.Enabled = false;
@@ -455,6 +458,8 @@ namespace SiteWordsExtractor
             item.SubItems.Add(wordsCount.ToString());
             item.SubItems.Add(filename);
             listViewResults.Items.Add(item);
+            listViewResults.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
         }
 
         #endregion // UI Update
@@ -471,7 +476,7 @@ namespace SiteWordsExtractor
             if (m_reportFolder != null)
             {
                 string logFilePath = m_reportFolder + "/" + LOG_FILE_NAME;
-                m_logger = new StreamWriter(logFilePath, false, Encoding.UTF8);
+                m_simpleLogger = new SimpleLogger(logFilePath);
             }
         }
 
@@ -483,36 +488,17 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            if (m_logger == null)
-            {
-                // make sure the logger is created first
-                createLogFile();
-            }
-
-            if (m_logger != null)
-            {
-                string timestamp = DateTime.Now.ToString("[HH:mm:ss] ");
-                m_logger.WriteLine(timestamp + msg);
-            }
+            m_simpleLogger.Log(msg);
         }
 
         private void LogErr(string msg)
         {
-            Log("ERROR: " + msg);
+            m_simpleLogger.LogErr(msg);
         }
 
         private void LogWrn(string msg)
         {
-            Log("WARNING: " + msg);
-        }
-
-        private void closeLogFile()
-        {
-            if (m_logger != null)
-            {
-                m_logger.Close();
-                m_logger = null;
-            }
+            m_simpleLogger.LogWrn(msg);
         }
 
         #endregion // Logger

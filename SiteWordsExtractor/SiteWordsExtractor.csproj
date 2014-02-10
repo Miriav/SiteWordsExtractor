@@ -50,6 +50,9 @@
     <Reference Include="log4net">
       <HintPath>..\ExternalLib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Rtf">
+      <HintPath>..\ExternalLib\Rtf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Extensions" />
@@ -68,12 +71,14 @@
     <Compile Include="Html2Text.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RtfPageFile.cs" />
     <Compile Include="Settings.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="SimpleLogger.cs" />
     <Compile Include="SiteWordsExtractor.cs">
       <SubType>Form</SubType>
     </Compile>
