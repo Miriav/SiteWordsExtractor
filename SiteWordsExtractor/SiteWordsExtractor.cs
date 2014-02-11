@@ -46,6 +46,7 @@ namespace SiteWordsExtractor
         BackgroundWorker m_backgroundWorker;
         List<string> m_scrappedNodesList;
         List<string> m_rippedAttributesList;
+        List<string> m_notAllowedFileExtList;
         SimpleLogger m_simpleLogger;
 
         #endregion
@@ -121,6 +122,7 @@ namespace SiteWordsExtractor
 
             m_scrappedNodesList = new List<string>(m_appSettings.scrappedHTMLTags.Split(','));
             m_rippedAttributesList = new List<string>(m_appSettings.attributes.Split(','));
+            m_notAllowedFileExtList = new List<string>(m_appSettings.fileExt.Split(','));
 
             return true;
         }
@@ -172,6 +174,23 @@ namespace SiteWordsExtractor
             crawler.PageCrawlCompletedAsync += crawler_PageCrawlCompletedAsync;
             crawler.PageCrawlDisallowedAsync += crawler_PageCrawlDisallowedAsync;
             crawler.PageLinksCrawlDisallowedAsync += crawler_PageLinksCrawlDisallowedAsync;
+            crawler.ShouldCrawlPage((pageToCrawl, crawlContext) =>
+            {
+                CrawlDecision decision = new CrawlDecision();
+                FileInfo fi = new FileInfo(pageToCrawl.Uri.AbsolutePath);
+                string ext = fi.Extension;
+                foreach (string notAllowedExt in m_notAllowedFileExtList)
+                {
+                    if (ext == notAllowedExt)
+                    {
+                        return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
+                    }
+                }
+
+                decision = new CrawlDecision { Allow = true };
+
+                return decision;
+            });
 
             updateCrawlingStarted();
 
@@ -414,6 +433,7 @@ namespace SiteWordsExtractor
             progressBar.Minimum = 0;
             progressBar.Value = 0;
             progressBar.Enabled = true;
+            progressLabel.Enabled = true;
             listViewResults.Items.Clear();
             siteURL.Enabled = false;
             goButton.Enabled = false;
@@ -451,10 +471,9 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            //progressBar.Value = progressBar.Maximum;
-            progressBar.Value = progressBar.Minimum;
+            progressBar.Value = progressBar.Maximum;
             progressBar.Enabled = false;
-            progressLabel.Text += " Finished!";
+            progressLabel.Enabled = false;
             siteURL.Enabled = true;
             goButton.Enabled = true;
             settingsButton.Enabled = true;

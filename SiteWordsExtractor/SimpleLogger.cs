@@ -12,17 +12,22 @@ namespace SiteWordsExtractor
         delegate void StringParameterDelegate(string value);
 
         StreamWriter m_logger;
+        System.Object m_lock;
 
         public SimpleLogger(string logFilepath)
         {
             m_logger = null;
+            m_lock = new System.Object();
             createLogFile(logFilepath);
         }
 
         public void createLogFile(string logFilepath)
         {
-            // create the log file
-            m_logger = new StreamWriter(logFilepath, false, Encoding.UTF8);
+            lock (m_lock)
+            {
+                // create the log file
+                m_logger = new StreamWriter(logFilepath, false, Encoding.UTF8);
+            }
 
             // first line in the log file
             Log("Log file created");
@@ -33,11 +38,14 @@ namespace SiteWordsExtractor
             // last line in the log file
             Log("Log file closed");
 
-            // close the log file
-            if (m_logger != null)
+            lock (m_lock)
             {
-                m_logger.Close();
-                m_logger = null;
+                // close the log file
+                if (m_logger != null)
+                {
+                    m_logger.Close();
+                    m_logger = null;
+                }
             }
         }
 
@@ -48,10 +56,13 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            if (m_logger != null)
+            lock (m_lock)
             {
-                string timestamp = DateTime.Now.ToString("[HH:mm:ss] ");
-                m_logger.WriteLineAsync(prefix + timestamp + msg);
+                if (m_logger != null)
+                {
+                    string timestamp = DateTime.Now.ToString("[HH:mm:ss] ");
+                    m_logger.WriteLineAsync(prefix + timestamp + msg);
+                }
             }
         }
 

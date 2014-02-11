@@ -28,6 +28,9 @@ namespace SiteWordsExtractor
         // List of HTML tags to extract (default is ALT, TITLE).
         public string attributes = "alt,title";
 
+        // List of not allowed file extensions
+        public string fileExt = ".jpg,.png,.gif";
+
         // regular expression to be used when counting words in a page
         public string wordRegex = @"[\S]+";
 
