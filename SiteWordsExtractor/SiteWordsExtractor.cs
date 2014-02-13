@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows;
 using Abot.Crawler;
 using Abot.Poco;
 using Abot.Core;
@@ -18,10 +19,84 @@ namespace SiteWordsExtractor
  
     public partial class SiteWordsExtractor : Form
     {
+        private class RtfFileWriter
+        {
+            RtfPageFile rtfFile;
+            EventHandler<string> startDelegate;
+            EventHandler<string> endDelegate;
+            EventHandler<KeyValuePair<string, string>> textFoundDelegate;
+            EventHandler<KeyValuePair<string, string>> attFoundDelegate;
+            HtmlPageProcessor m_processor;
+            WordsCounter m_wordsCounter;
+
+            private int wordsCount;
+            public int WordsCount
+            {
+                get { return wordsCount; }
+            }
+
+            public RtfFileWriter(string filepath, string wordsRegex)
+            {
+                wordsCount = 0;
+                m_wordsCounter = new WordsCounter(wordsRegex);
+
+                rtfFile = new RtfPageFile(filepath);
+                startDelegate = delegate(object o, string url)
+                {
+                    rtfFile.AddHyperlink(url, "--- START PAGE ---");
+                };
+                endDelegate = delegate(object o, string url)
+                {
+                    rtfFile.AppendText("--- END PAGE (" + wordsCount.ToString() + " words) ---");
+                };
+                textFoundDelegate = delegate(object obj, KeyValuePair<string, string> kvp)
+                {
+                    string tagName = kvp.Key;
+                    string text = kvp.Value;
+                    if (!String.IsNullOrWhiteSpace(text))
+                    {
+                        rtfFile.AppendHtmlElement(text);
+                        wordsCount += m_wordsCounter.CountWords(text);
+                    }
+                };
+                attFoundDelegate = delegate(object obj, KeyValuePair<string, string> kvp)
+                {
+                    string attName = kvp.Key;
+                    string attValue = kvp.Value;
+                    if (!String.IsNullOrWhiteSpace(attValue))
+                    {
+                        rtfFile.AppendHtmlAttribute(attValue);
+                        wordsCount += m_wordsCounter.CountWords(attValue);
+                    }
+                };
+            }
+
+            public void Start(HtmlPageProcessor processor)
+            {
+                m_processor = processor;
+                m_processor.OnStartProcessPage += startDelegate;
+                m_processor.OnEndProcessPage += endDelegate;
+                m_processor.OnTextFound += textFoundDelegate;
+                m_processor.OnAttributeFound += attFoundDelegate;
+            }
+
+            public void Done()
+            {
+                m_processor.OnStartProcessPage -= startDelegate;
+                m_processor.OnEndProcessPage -= endDelegate;
+                m_processor.OnTextFound -= textFoundDelegate;
+                m_processor.OnAttributeFound -= attFoundDelegate;
+                rtfFile.saveRtf();
+            }
+        }
+
         #region Delegates
 
         // delegate for passing a string parameter
         delegate void StringParameterDelegate(string value);
+
+        // delegate for passing a number parameter
+        delegate void IntParameterDelegate(int value);
 
         // delegate for passing the counters as parameters
         delegate void CoutnersParametersDelegate(int linksFound, int linksVisited, int linksSkipped);
@@ -35,6 +110,7 @@ namespace SiteWordsExtractor
 
         private const string REPROT_FOLDER_NAME = "Report";
         private const string LOG_FILE_NAME = "log.txt";
+        private const string GLOBAL_RFT_FILENAME = "report.rtf";
 
         #endregion // Constants
 
@@ -44,10 +120,9 @@ namespace SiteWordsExtractor
         string m_statsRootFolder;
         string m_reportFolder;
         BackgroundWorker m_backgroundWorker;
-        List<string> m_scrappedNodesList;
-        List<string> m_rippedAttributesList;
         List<string> m_notAllowedFileExtList;
         SimpleLogger m_simpleLogger;
+        HtmlPageProcessor m_pageProcessor;
 
         #endregion
         
@@ -69,6 +144,7 @@ namespace SiteWordsExtractor
             m_statsRootFolder = null;
             m_reportFolder = null;
             m_simpleLogger = null;
+            m_pageProcessor = new HtmlPageProcessor();
 
             validateSettings();
         }
@@ -120,9 +196,10 @@ namespace SiteWordsExtractor
         {
             // TODO: validate settings
 
-            m_scrappedNodesList = new List<string>(m_appSettings.scrappedHTMLTags.Split(','));
-            m_rippedAttributesList = new List<string>(m_appSettings.attributes.Split(','));
             m_notAllowedFileExtList = new List<string>(m_appSettings.fileExt.Split(','));
+
+            m_pageProcessor.SetTagsToIgnore(m_appSettings.scrappedHTMLTags);
+            m_pageProcessor.SetAttributesToRip(m_appSettings.attributes);
 
             return true;
         }
@@ -169,7 +246,6 @@ namespace SiteWordsExtractor
             //crawlConfig.MinCrawlDelayPerDomainMilliSeconds = m_appSettings.minHTTPdelayMs;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(crawlConfig, null, null, null, null, null, null, null, null);
-            //PoliteWebCrawler crawler = new PoliteWebCrawler();
             crawler.PageCrawlStartingAsync += crawler_PageCrawlStartingAsync;
             crawler.PageCrawlCompletedAsync += crawler_PageCrawlCompletedAsync;
             crawler.PageCrawlDisallowedAsync += crawler_PageCrawlDisallowedAsync;
@@ -192,6 +268,12 @@ namespace SiteWordsExtractor
                 return decision;
             });
 
+            string globalRtfFilepath = m_reportFolder + "/" + GLOBAL_RFT_FILENAME;
+            RtfFileWriter globalRtfWriter = new RtfFileWriter(globalRtfFilepath, m_appSettings.wordRegex);
+            globalRtfWriter.Start(m_pageProcessor);
+
+            // TODO: create global words counter
+
             updateCrawlingStarted();
 
             Uri url = new Uri(siteURL.Text);
@@ -205,7 +287,16 @@ namespace SiteWordsExtractor
 
             string elapsedTimeStr = crawlerResult.Elapsed.ToString(@"dd\.hh\:mm\:ss");
             Log("*** Crawling completed. Elapsed time: " + elapsedTimeStr);
-            
+            Log("*** Total words found in this site: " + globalRtfWriter.WordsCount);
+
+            int totalWordsCount = globalRtfWriter.WordsCount;
+
+            // close global rtf file of site
+            globalRtfWriter.Done();
+
+            // create CSV report
+            createCSVFile(totalWordsCount);
+
             updateCrawlingFinished();
             done();
         }
@@ -218,18 +309,45 @@ namespace SiteWordsExtractor
             string rtfFilepath = m_statsRootFolder + "/" + rtfFilename;
 
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
-            HtmlAgilityPack.HtmlNode root = htmlDoc.DocumentNode;
+            RtfFileWriter rtfFileWriter = new RtfFileWriter(rtfFilepath, m_appSettings.wordRegex);
+            rtfFileWriter.Start(m_pageProcessor);
 
-            Html2Text html2Text = new Html2Text(rtfFilepath, m_scrappedNodesList, m_rippedAttributesList);
-            string htmlString = html2Text.ConvertHtml(url, htmlDoc);
-            //Log(htmlString);
+            m_pageProcessor.ProcessHtmlPage(url, htmlDoc);
 
-            int wordsCount = WordsCounter.CountWords(htmlString, m_appSettings.wordRegex);
+            int wordsCount = rtfFileWriter.WordsCount;
+
+            rtfFileWriter.Done();
+
             Log("Found " + wordsCount.ToString() + " words in page: " + url);
 
             updateListView(url, wordsCount, rtfFilename);
         }
-        
+
+        private void createCSVFile(int totalWordsCount)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new IntParameterDelegate(createCSVFile), totalWordsCount);
+                return;
+            }
+
+            string csvFilepath = m_reportFolder + "/" + m_appSettings.statFilename;
+            StreamWriter csvFile = new StreamWriter(csvFilepath);
+            csvFile.WriteLine("Site: " + siteURL.Text);
+            csvFile.WriteLine("Total number of pages: " + listViewResults.Items.Count.ToString());
+            csvFile.WriteLine("Total number of words: " + totalWordsCount.ToString());
+            csvFile.WriteLine();
+            csvFile.WriteLine("URL,Words,RTF File");
+            foreach (ListViewItem item in listViewResults.Items)
+            {
+                string pageUrl = item.Text;
+                string pageWordsCount = item.SubItems[1].Text;
+                string rtfFilename = item.SubItems[2].Text;
+                csvFile.WriteLine(pageUrl + "," + pageWordsCount + "," + rtfFilename);
+            }
+            csvFile.Close();
+        }
+                
         #region Crawler Callbacks
 
         void crawler_PageCrawlStartingAsync(object sender, PageCrawlStartingArgs e)
@@ -254,7 +372,14 @@ namespace SiteWordsExtractor
 
             if (crawledPage.WebException != null || crawledPage.HttpWebResponse.StatusCode != HttpStatusCode.OK)
             {
-                msg = "Failed to crawl to page: " + crawledPage.Uri.AbsoluteUri.ToString() + ", Status: " + crawledPage.HttpWebResponse.StatusCode.ToString();
+                if (crawledPage.HttpWebResponse != null)
+                {
+                    msg = "Failed to crawl to page: " + crawledPage.Uri.AbsoluteUri.ToString() + ", Status: " + crawledPage.HttpWebResponse.StatusCode.ToString();
+                }
+                else
+                {
+                    msg = "Failed to crawl to page: " + crawledPage.Uri.AbsoluteUri.ToString() + ", no HTTP response";
+                }
                 LogErr(msg);
             }
             else
@@ -399,6 +524,10 @@ namespace SiteWordsExtractor
             filename = filename.Replace('>', '3');
             filename = filename.Replace('|', '!');
             filename = filename.Replace('?', '-');
+            if (filename == String.Empty)
+            {
+                filename = "_";
+            }
             filename += ext;
 
             return filename;

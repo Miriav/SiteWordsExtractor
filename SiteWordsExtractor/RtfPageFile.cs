@@ -62,14 +62,8 @@ namespace SiteWordsExtractor
 
         public void AppendHtmlElement(string text)
         {
-            RtfFormattedParagraph p = new RtfFormattedParagraph(new RtfParagraphFormatting(m_pageFormat.ParagraphFontSize, m_pageFormat.ParagraphAlignment));
-            p.Formatting.FontIndex = 1;
-            p.Formatting.TextColorIndex = 1;
-            p.Formatting.SpaceAfter = TwipConverter.ToTwip(m_pageFormat.ParagraphSpaceAfter, MetricUnit.Point);
-            p.AppendText(text);
-            //p.AppendText(new RtfFormattedText(alt, 2)); // alt color is 2
-
-            m_doc.Contents.Add(p);
+            AppendText(text);
+            return;
         }
 
         public void AppendHtmlAttribute(string attValue)
@@ -83,7 +77,7 @@ namespace SiteWordsExtractor
             m_doc.Contents.Add(p);
         }
 
-        public void AddHyperlink(string url)
+        public void AddHyperlink(string url, string prefixText = "")
         {
             RtfFormattedParagraph p = new RtfFormattedParagraph(new RtfParagraphFormatting(m_pageFormat.ParagraphFontSize, m_pageFormat.ParagraphAlignment));
 
@@ -91,7 +85,19 @@ namespace SiteWordsExtractor
 
             RtfFormattedText linkText = new RtfFormattedText(url, RtfCharacterFormatting.Underline, 3); // color index for links is 3
             linkText.BackgroundColorIndex = 1;
+            p.AppendParagraph(prefixText);
             p.AppendParagraph(new RtfHyperlink(url, linkText));
+
+            m_doc.Contents.Add(p);
+        }
+
+        public void AppendText(string text)
+        {
+            RtfFormattedParagraph p = new RtfFormattedParagraph(new RtfParagraphFormatting(m_pageFormat.ParagraphFontSize, m_pageFormat.ParagraphAlignment));
+            p.Formatting.FontIndex = 1;
+            p.Formatting.TextColorIndex = 1;
+            p.Formatting.SpaceAfter = TwipConverter.ToTwip(m_pageFormat.ParagraphSpaceAfter, MetricUnit.Point);
+            p.AppendText(text);
 
             m_doc.Contents.Add(p);
         }
