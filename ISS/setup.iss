@@ -123,7 +123,7 @@ end;
 function InitializeSetup(): Boolean;
 begin
     if not IsDotNetDetected('v4\Full', 0) then begin
-        MsgBox('{#MyAppName} requires Microsoft .NET Framework 4.0 Client Profile.'#13#13
+        MsgBox('{#MyAppName} requires Microsoft .NET Framework 4.5 Client Profile.'#13#13
           'The installer will attempt to install it', mbInformation, MB_OK);        
     end;
     
