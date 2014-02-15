@@ -71,7 +71,6 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="AppSettingsStorage.cs" />
-    <Compile Include="Html2Text.cs" />
     <Compile Include="HtmlPageProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
