@@ -56,5 +56,14 @@ namespace SiteWordsExtractor
             AppSettings defaultSettings = new AppSettings();
             SetAppSettings(defaultSettings);
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                reportsRoot.Text = dlg.SelectedPath;
+            }
+        }
     }
 }
