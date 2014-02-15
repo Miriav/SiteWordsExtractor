@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -123,7 +124,8 @@ namespace SiteWordsExtractor
         List<string> m_notAllowedFileExtList;
         SimpleLogger m_simpleLogger;
         HtmlPageProcessor m_pageProcessor;
-
+        ListViewColumnSorter m_columnSorter;
+        
         #endregion
         
         #region Counters
@@ -145,6 +147,8 @@ namespace SiteWordsExtractor
             m_reportFolder = null;
             m_simpleLogger = null;
             m_pageProcessor = new HtmlPageProcessor();
+            m_columnSorter = new ListViewColumnSorter();
+            listViewResults.ListViewItemSorter = m_columnSorter;
 
             validateSettings();
         }
@@ -588,6 +592,8 @@ namespace SiteWordsExtractor
             goButton.Enabled = false;
             settingsButton.Enabled = false;
 
+            listViewResults.ColumnClick -= listViewResults_ColumnClick;
+
             updateStatusLine("Crawling started...");
         }
 
@@ -627,7 +633,35 @@ namespace SiteWordsExtractor
             goButton.Enabled = true;
             settingsButton.Enabled = true;
 
+            listViewResults.ColumnClick += listViewResults_ColumnClick;
+
             updateStatusLine("Crawling finished");
+        }
+
+        void listViewResults_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            //listViewResults.ListViewItemSorter = new ListViewItemComparer(e.Column);
+            if (e.Column == m_columnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (m_columnSorter.Order == SortOrder.Ascending)
+                {
+                    m_columnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    m_columnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                m_columnSorter.SortColumn = e.Column;
+                m_columnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            listViewResults.Sort();
         }
 
         private void updateListView(string url, int wordsCount, string filename)
