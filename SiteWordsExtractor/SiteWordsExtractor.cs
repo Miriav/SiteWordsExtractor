@@ -192,6 +192,26 @@ namespace SiteWordsExtractor
             m_backgroundWorker.RunWorkerAsync();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            switch (e.CloseReason)
+            {
+                case CloseReason.UserClosing:
+                    if (MessageBox.Show("Are you sure you want to exit the application?", "Site Words Extractor", MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                    break;
+                case CloseReason.WindowsShutDown:
+                    e.Cancel = false; //this is propably dumb
+                    break;
+                default:
+                    break;
+            }
+
+            base.OnFormClosing(e);
+        }
+
         private bool validateSettings()
         {
             // TODO: validate settings
