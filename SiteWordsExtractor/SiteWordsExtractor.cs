@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
+using log4net;
+using log4net.Config;
 using Abot.Crawler;
 using Abot.Poco;
 using Abot.Core;
@@ -20,76 +22,7 @@ namespace SiteWordsExtractor
  
     public partial class SiteWordsExtractor : Form
     {
-        private class RtfFileWriter
-        {
-            RtfPageFile rtfFile;
-            EventHandler<string> startDelegate;
-            EventHandler<string> endDelegate;
-            EventHandler<KeyValuePair<string, string>> textFoundDelegate;
-            EventHandler<KeyValuePair<string, string>> attFoundDelegate;
-            HtmlPageProcessor m_processor;
-            WordsCounter m_wordsCounter;
-
-            private int wordsCount;
-            public int WordsCount
-            {
-                get { return wordsCount; }
-            }
-
-            public RtfFileWriter(string filepath, string wordsRegex)
-            {
-                wordsCount = 0;
-                m_wordsCounter = new WordsCounter(wordsRegex);
-
-                rtfFile = new RtfPageFile(filepath);
-                startDelegate = delegate(object o, string url)
-                {
-                    rtfFile.AddHyperlink(url, "--- START PAGE ---");
-                };
-                endDelegate = delegate(object o, string url)
-                {
-                    rtfFile.AppendText("--- END PAGE (" + wordsCount.ToString() + " words) ---");
-                };
-                textFoundDelegate = delegate(object obj, KeyValuePair<string, string> kvp)
-                {
-                    string tagName = kvp.Key;
-                    string text = kvp.Value;
-                    if (!String.IsNullOrWhiteSpace(text))
-                    {
-                        rtfFile.AppendHtmlElement(text);
-                        wordsCount += m_wordsCounter.CountWords(text);
-                    }
-                };
-                attFoundDelegate = delegate(object obj, KeyValuePair<string, string> kvp)
-                {
-                    string attName = kvp.Key;
-                    string attValue = kvp.Value;
-                    if (!String.IsNullOrWhiteSpace(attValue))
-                    {
-                        rtfFile.AppendHtmlAttribute(attValue);
-                        wordsCount += m_wordsCounter.CountWords(attValue);
-                    }
-                };
-            }
-
-            public void Start(HtmlPageProcessor processor)
-            {
-                m_processor = processor;
-                m_processor.OnStartProcessPage += startDelegate;
-                m_processor.OnEndProcessPage += endDelegate;
-                m_processor.OnTextFound += textFoundDelegate;
-                m_processor.OnAttributeFound += attFoundDelegate;
-            }
-
-            public void Done()
-            {
-                m_processor.OnStartProcessPage -= startDelegate;
-                m_processor.OnEndProcessPage -= endDelegate;
-                m_processor.OnTextFound -= textFoundDelegate;
-                m_processor.OnAttributeFound -= attFoundDelegate;
-                rtfFile.saveRtf();
-            }
-        }
+        public static readonly ILog log = LogManager.GetLogger(typeof(SiteWordsExtractor));
 
         #region Delegates
 
@@ -122,8 +55,7 @@ namespace SiteWordsExtractor
         string m_reportFolder;
         BackgroundWorker m_backgroundWorker;
         List<string> m_notAllowedFileExtList;
-        SimpleLogger m_simpleLogger;
-        HtmlPageProcessor m_pageProcessor;
+        HtmlProcessor m_htmlProcessor;
         ListViewColumnSorter m_columnSorter;
         
         #endregion
@@ -138,20 +70,37 @@ namespace SiteWordsExtractor
 
         public SiteWordsExtractor()
         {
+            // initialize the windows form components
             InitializeComponent();
+
+            // load logger configuration
+            configLogger();
+            log.Info("-------------------");
+            log.Info("Application started");
+
+
             m_appSettings = AppSettingsStorage.Load();
             updateStatusLine("Configuration Loaded");
             siteURL.Text = m_appSettings.defaultUrl;
             progressLabel.Text = "";
             m_statsRootFolder = null;
             m_reportFolder = null;
-            m_simpleLogger = null;
-            m_pageProcessor = new HtmlPageProcessor();
+            //m_simpleLogger = null;
+            m_htmlProcessor = new HtmlProcessor();
             m_columnSorter = new ListViewColumnSorter();
             listViewResults.ListViewItemSorter = m_columnSorter;
 
             validateSettings();
         }
+
+        private void configLogger()
+        {
+            FileInfo exePath = new FileInfo(Application.ExecutablePath);
+            string log4netConfigFilename = exePath.Directory.FullName + "\\log4net.xml";
+            FileInfo log4netConfigFile = new FileInfo(log4netConfigFilename);
+            ICollection col = XmlConfigurator.Configure(log4netConfigFile);
+        }
+
 
         private void settingsButton_Click(object sender, EventArgs e)
         {
@@ -222,14 +171,15 @@ namespace SiteWordsExtractor
 
             m_notAllowedFileExtList = new List<string>(m_appSettings.fileExt.Split(','));
 
-            m_pageProcessor.SetTagsToIgnore(m_appSettings.scrappedHTMLTags);
-            m_pageProcessor.SetAttributesToRip(m_appSettings.attributes);
+            m_htmlProcessor.SetAttributes(m_appSettings.attributes);
 
             return true;
         }
 
         private bool init()
         {
+            log.Info("Start working on site: " + siteURL.Text);
+
             // create stats sub folder
             createStatsSubFolder();
             if (String.IsNullOrWhiteSpace(m_statsRootFolder))
@@ -244,10 +194,12 @@ namespace SiteWordsExtractor
                 return false;
             }
 
+            createLogFile();
+
             m_backgroundWorker = new BackgroundWorker();
             m_backgroundWorker.DoWork += new DoWorkEventHandler(doWork);
 
-            Log("Initialized");
+            log.Debug("Initialized");
 
             return true;
         }
@@ -255,7 +207,10 @@ namespace SiteWordsExtractor
         private void done()
         {
             // close log file
-            m_simpleLogger.closeLogFile();
+            FileInfo exePath = new FileInfo(Application.ExecutablePath);
+            string logFilepath = exePath.Directory.FullName + "\\" + LOG_FILE_NAME;
+            changeLogFile(logFilepath);
+            log.Info("Done working on site: " + siteURL.Text);
         }
 
         private void doWork(object sender, DoWorkEventArgs e)
@@ -263,6 +218,7 @@ namespace SiteWordsExtractor
             CrawlConfiguration crawlConfig = new CrawlConfiguration();
             //crawlConfig.CrawlTimeoutSeconds = m_appSettings.httpTimeoutSec;
             crawlConfig.MaxConcurrentThreads = 10;
+            //crawlConfig.MaxConcurrentThreads = 1;
             crawlConfig.MaxPagesToCrawl = m_appSettings.maxPagesPerSite;
             crawlConfig.UserAgentString = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36";
             crawlConfig.HttpRequestMaxAutoRedirects = m_appSettings.maxRedirects;
@@ -293,8 +249,9 @@ namespace SiteWordsExtractor
             });
 
             string globalRtfFilepath = m_reportFolder + "/" + GLOBAL_RFT_FILENAME;
-            RtfFileWriter globalRtfWriter = new RtfFileWriter(globalRtfFilepath, m_appSettings.wordRegex);
-            globalRtfWriter.Start(m_pageProcessor);
+            Html2Rtf globalRtf = new Html2Rtf(globalRtfFilepath, m_appSettings.wordRegex);
+            globalRtf.RegisterProcessor(m_htmlProcessor);
+
 
             // TODO: create global words counter
 
@@ -310,16 +267,16 @@ namespace SiteWordsExtractor
             }
 
             string elapsedTimeStr = crawlerResult.Elapsed.ToString(@"dd\.hh\:mm\:ss");
-            Log("*** Crawling completed. Elapsed time: " + elapsedTimeStr);
-            Log("*** Total words found in this site: " + globalRtfWriter.WordsCount);
-
-            int totalWordsCount = globalRtfWriter.WordsCount;
+            int globalWordsCount = globalRtf.WordsCount;
+            log.Debug("*** Crawling completed. Elapsed time: " + elapsedTimeStr);
+            log.Debug("*** Total words found in this site: " + globalWordsCount.ToString());
 
             // close global rtf file of site
-            globalRtfWriter.Done();
+            globalRtf.UnregisterProcessor();
 
             // create CSV report
-            createCSVFile(totalWordsCount);
+            //createCSVFile(totalWordsCount);
+            createCSVFile(globalWordsCount);
 
             updateCrawlingFinished();
             done();
@@ -331,22 +288,19 @@ namespace SiteWordsExtractor
             string url = uri.AbsoluteUri.ToString();
             string rtfFilename = buildFileNameFromUrl(uri, ".rtf");
             string rtfFilepath = m_statsRootFolder + "/" + rtfFilename;
-
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
-            RtfFileWriter rtfFileWriter = new RtfFileWriter(rtfFilepath, m_appSettings.wordRegex);
-            rtfFileWriter.Start(m_pageProcessor);
 
-            m_pageProcessor.ProcessHtmlPage(url, htmlDoc);
+            int wordsCount = 0;
 
-            int wordsCount = rtfFileWriter.WordsCount;
-
-            rtfFileWriter.Done();
-
-            Log("Found " + wordsCount.ToString() + " words in page: " + url);
+            Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, m_appSettings.wordRegex);
+            rtfFile.RegisterProcessor(m_htmlProcessor);
+            m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
+            wordsCount = rtfFile.WordsCount;
+            rtfFile.UnregisterProcessor();
 
             updateListView(url, wordsCount, rtfFilename);
         }
-
+        
         private void createCSVFile(int totalWordsCount)
         {
             if (InvokeRequired)
@@ -383,7 +337,7 @@ namespace SiteWordsExtractor
             updateCrawlingProgress(m_linksFound, -1, -1);
 
             msg = "checking: " + pageToCrawl.Uri.AbsoluteUri.ToString() + " (parent: " + pageToCrawl.ParentUri.AbsoluteUri.ToString() + ")";
-            Log(msg);
+            log.Debug(msg);
         }
 
         void crawler_PageCrawlCompletedAsync(object sender, PageCrawlCompletedArgs e)
@@ -404,12 +358,12 @@ namespace SiteWordsExtractor
                 {
                     msg = "Failed to crawl to page: " + crawledPage.Uri.AbsoluteUri.ToString() + ", no HTTP response";
                 }
-                LogErr(msg);
+                log.Error(msg);
             }
             else
             {
                 msg = "page visited: " + crawledPage.Uri.AbsoluteUri.ToString();
-                Log(msg);
+                log.Debug(msg);
                 updateStatusLine(crawledPage.Uri.AbsoluteUri.ToString());
                 processCrawledPage(crawledPage);
                 //CountWordsOnPage(crawledPage);
@@ -425,7 +379,7 @@ namespace SiteWordsExtractor
             updateCrawlingProgress(-1, -1, m_linksSkipped);
 
             msg = "Did not crawl the links on page " + pageToCrawl.Uri.AbsoluteUri.ToString() + " due to " + e.DisallowedReason.ToString();
-            LogWrn(msg);
+            log.Warn(msg);
         }
 
         void crawler_PageLinksCrawlDisallowedAsync(object sender, PageLinksCrawlDisallowedArgs e)
@@ -437,7 +391,7 @@ namespace SiteWordsExtractor
             updateCrawlingProgress(-1, -1, m_linksSkipped);
 
             msg = "Did not crawl the links on page " + crawledPage.Uri.AbsoluteUri.ToString() + " due to " + e.DisallowedReason.ToString();
-            LogWrn(msg);
+            log.Warn(msg);
         }
 
         #endregion // Crawler Callbacks
@@ -694,35 +648,31 @@ namespace SiteWordsExtractor
             if (m_reportFolder != null)
             {
                 string logFilePath = m_reportFolder + "/" + LOG_FILE_NAME;
-                m_simpleLogger = new SimpleLogger(logFilePath);
+                log.Info("Logging file is: " + logFilePath);
+                changeLogFile(logFilePath);
             }
+
         }
 
-        private void Log(string msg)
+        private void changeLogFile(string logFilepath)
         {
-            if (InvokeRequired)
+            log4net.Repository.Hierarchy.Hierarchy h = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
+            log4net.Appender.IAppender[] appenders = log.Logger.Repository.GetAppenders();
+            foreach (log4net.Appender.IAppender appender in appenders)
             {
-                BeginInvoke(new StringParameterDelegate(Log), msg);
-                return;
+                if (appender is log4net.Appender.FileAppender)
+                {
+                    log4net.Appender.FileAppender fileAppender = (log4net.Appender.FileAppender)appender;
+                    if (fileAppender.Name == "FileAppender")
+                    {
+                        fileAppender.File = logFilepath;
+                        fileAppender.ActivateOptions();
+                        break;
+                    }
+                }
             }
-
-            if (m_simpleLogger == null)
-            {
-                createLogFile();
-            }
-            m_simpleLogger.Log(msg);
         }
-
-        private void LogErr(string msg)
-        {
-            m_simpleLogger.LogErr(msg);
-        }
-
-        private void LogWrn(string msg)
-        {
-            m_simpleLogger.LogWrn(msg);
-        }
-
+                
         #endregion // Logger
 
     }

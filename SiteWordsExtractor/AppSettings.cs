@@ -29,7 +29,7 @@ namespace SiteWordsExtractor
         public string attributes = "alt,title";
 
         // List of not allowed file extensions
-        public string fileExt = ".jpg,.png,.gif";
+        public string fileExt = ".jpg,.png,.gif,.zip,.pdf";
 
         // regular expression to be used when counting words in a page
         public string wordRegex = "[^\\s\\.\\$\\^\\{\\[\\(\\|\\)\\*\\+\\?\\\\!@#%&-_=;:'\"`~<>/]+";

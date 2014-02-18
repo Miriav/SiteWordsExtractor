@@ -71,18 +71,19 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="AppSettingsStorage.cs" />
-    <Compile Include="HtmlPageProcessor.cs" />
+    <Compile Include="Html2Rtf.cs" />
+    <Compile Include="HtmlProcessor.cs" />
+    <Compile Include="HyperlinkEventArgs.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RtfPageFile.cs" />
+    <Compile Include="RtfPageBuilder.cs" />
     <Compile Include="Settings.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
-    <Compile Include="SimpleLogger.cs" />
     <Compile Include="SiteWordsExtractor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,8 +121,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="html.ico" />
+    <Content Include="log4net.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(ProjectDir)\log4net.xml" $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
