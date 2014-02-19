@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Windows;
 using log4net;
 using log4net.Config;
+using log4net.Core;
 using Abot.Crawler;
 using Abot.Poco;
 using Abot.Core;
@@ -233,8 +234,18 @@ namespace SiteWordsExtractor
             crawler.ShouldCrawlPage((pageToCrawl, crawlContext) =>
             {
                 CrawlDecision decision = new CrawlDecision();
-                FileInfo fi = new FileInfo(pageToCrawl.Uri.AbsolutePath);
-                string ext = fi.Extension;
+                FileInfo fi;
+                string ext = "";
+                try
+                {
+                    log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
+                    fi = new FileInfo(pageToCrawl.Uri.AbsolutePath);
+                    ext = fi.Extension;
+                }
+                catch (Exception excep)
+                {
+                    log.Error("failed to get absolute path of url: " + excep.ToString());
+                }
                 foreach (string notAllowedExt in m_notAllowedFileExtList)
                 {
                     if (ext == notAllowedExt)
@@ -651,11 +662,12 @@ namespace SiteWordsExtractor
                 log.Info("Logging file is: " + logFilePath);
                 changeLogFile(logFilePath);
             }
-
         }
 
         private void changeLogFile(string logFilepath)
         {
+            log4net.Repository.Hierarchy.Logger logger = (log4net.Repository.Hierarchy.Logger)log.Logger;
+
             log4net.Repository.Hierarchy.Hierarchy h = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
             log4net.Appender.IAppender[] appenders = log.Logger.Repository.GetAppenders();
             foreach (log4net.Appender.IAppender appender in appenders)
@@ -663,12 +675,16 @@ namespace SiteWordsExtractor
                 if (appender is log4net.Appender.FileAppender)
                 {
                     log4net.Appender.FileAppender fileAppender = (log4net.Appender.FileAppender)appender;
+                    
                     if (fileAppender.Name == "FileAppender")
                     {
+                        logger.RemoveAppender(fileAppender);
                         fileAppender.File = logFilepath;
                         fileAppender.ActivateOptions();
+                        logger.AddAppender(fileAppender);
                         break;
                     }
+
                 }
             }
         }
