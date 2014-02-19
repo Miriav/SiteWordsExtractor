@@ -32,7 +32,7 @@ namespace SiteWordsExtractor
         public string fileExt = ".jpg,.png,.gif,.zip,.pdf";
 
         // regular expression to be used when counting words in a page
-        public string wordRegex = "[^\\s\\.\\$\\^\\{\\[\\(\\|\\)\\*\\+\\?\\\\!@#%&-_=;:'\"`~<>/]+";
+        public string wordRegex = @"[^\s\.\$\^\{\[\(\|\)\*\+\?\\!@#%&_=;:'""`~<>\-\/]+";
 
         #endregion
 

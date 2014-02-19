@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 
 namespace SiteWordsExtractor
 {
     class Html2Rtf
     {
+        public static readonly ILog log = LogManager.GetLogger(typeof(Html2Rtf));
+
         private RtfPageBuilder m_rtf;
         private HtmlProcessor m_processor;
         private WordsCounter m_wordsCounter;
+
+        private string m_filename;
 
         private int m_wordsCount;
         public int WordsCount
@@ -20,7 +25,11 @@ namespace SiteWordsExtractor
 
         public Html2Rtf(string filepath, string wordsRegex)
         {
+            m_filename = filepath;
+
             m_wordsCount = 0;
+            log.Debug("m_wordsCount=" + m_wordsCount.ToString());
+
             m_wordsCounter = new WordsCounter(wordsRegex);
 
             m_rtf = new RtfPageBuilder(filepath);
@@ -49,6 +58,8 @@ namespace SiteWordsExtractor
             m_processor.OnHyperlink -= OnHyperlink;
             m_processor = null;
             m_rtf.CloseFile();
+
+            log.Debug("UnregisterProcessor: file=[" + m_filename + "], words count=" + m_wordsCount.ToString());
         }
 
         private void OnStartProcessPage(object sender, string url)
@@ -63,6 +74,7 @@ namespace SiteWordsExtractor
         {
             m_rtf.StartNewParagraph();
             m_rtf.AppendText("-- PAGE END. Total words: " + WordsCount.ToString());
+            log.Debug("-- PAGE END. Total words: " + WordsCount.ToString());
             m_rtf.StartNewParagraph();
         }
 
@@ -75,12 +87,14 @@ namespace SiteWordsExtractor
         {
             m_rtf.AppendText(text);
             m_wordsCount += m_wordsCounter.CountWords(text);
+            log.Debug("m_wordsCount=" + m_wordsCount.ToString());
         }
 
         private void OnBoldText(object sender, string text)
         {
             m_rtf.AppendBoldText(text);
             m_wordsCount += m_wordsCounter.CountWords(text);
+            log.Debug("m_wordsCount=" + m_wordsCount.ToString());
         }
 
         private void OnAttribute(object sender, string value)
@@ -89,12 +103,14 @@ namespace SiteWordsExtractor
             m_rtf.AppendGrayText(value);
             m_rtf.StartNewParagraph();
             m_wordsCount += m_wordsCounter.CountWords(value);
+            log.Debug("m_wordsCount=" + m_wordsCount.ToString());
         }
 
         private void OnHyperlink(object sender, HyperlinkEventArgs args)
         {
             m_rtf.AppendHyperlink(args.Url, args.Text);
             m_wordsCount += m_wordsCounter.CountWords(args.Text);
+            log.Debug("m_wordsCount=" + m_wordsCount.ToString());
         }
     }
 }

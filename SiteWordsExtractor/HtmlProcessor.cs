@@ -76,6 +76,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnStartProcessPageEvent: " + url);
                 EventHandler<string> callback = OnStartProcessPage;
                 if (callback != null)
                 {
@@ -93,6 +94,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnEndProcessPageEvent: " + url);
                 EventHandler<string> callback = OnEndProcessPage;
                 if (callback != null)
                 {
@@ -110,6 +112,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnNewParagraphEvent: " + tagName);
                 EventHandler<string> callback = OnNewParagraph;
                 if (callback != null)
                 {
@@ -127,6 +130,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnTextEvent: " + text);
                 EventHandler<string> callback = OnText;
                 if (callback != null)
                 {
@@ -144,6 +148,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnBoldTextEvent: " + text);
                 EventHandler<string> callback = OnBoldText;
                 if (callback != null)
                 {
@@ -161,6 +166,7 @@ namespace SiteWordsExtractor
         {
             try
             {
+                log.Debug("FireOnAttributeEvent: " + value);
                 EventHandler<string> callback = OnAttribute;
                 if (callback != null)
                 {
@@ -179,6 +185,7 @@ namespace SiteWordsExtractor
             // OnHyperlink
             try
             {
+                log.Debug("FireOnHyperlinkEvent: url=[" + url + "], text=[" + text + "]");
                 EventHandler<HyperlinkEventArgs> callback = OnHyperlink;
                 if (callback != null)
                 {
@@ -243,24 +250,7 @@ namespace SiteWordsExtractor
                 FireOnEndProcessPageEvent(url);
             }
         }
-
-        /*
-        public bool ProcessHtmlPage(string url, HtmlDocument doc, string rtfFilepath)
-        {
-            m_baseUri = new Uri(url, UriKind.Absolute);
-            m_rtf = new RtfPageBuilder(rtfFilepath);
-
-            m_rtf.AppendText("PAGE: ");
-            m_rtf.AppendHyperlink(url, url);
-            m_rtf.StartNewParagraph();
-
-            ProcessNode(doc.DocumentNode);
-
-            m_rtf.CloseFile();
-            return true;
-        }
-        */
-
+        
         private void ProcessNode(HtmlNode node)
         {
             string html;

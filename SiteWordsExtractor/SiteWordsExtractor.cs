@@ -43,7 +43,7 @@ namespace SiteWordsExtractor
 
         #region Constants
 
-        private const string REPROT_FOLDER_NAME = "Report";
+        private const string REPROT_FOLDER_NAME = "Report\\";
         private const string LOG_FILE_NAME = "log.txt";
         private const string GLOBAL_RFT_FILENAME = "report.rtf";
 
@@ -170,6 +170,19 @@ namespace SiteWordsExtractor
         {
             // TODO: validate settings
 
+            // validate root dir
+            string rootDir = m_appSettings.reportsRootFolder;
+            if (String.IsNullOrWhiteSpace(rootDir))
+            {
+                // if not selected, select current folder for reports
+                rootDir = ".\\";
+            }
+            if (!(rootDir.EndsWith("\\") || (rootDir.EndsWith("/"))))
+            {
+                rootDir += "\\";
+            }
+            m_appSettings.reportsRootFolder = rootDir;
+
             m_notAllowedFileExtList = new List<string>(m_appSettings.fileExt.Split(','));
 
             m_htmlProcessor.SetAttributes(m_appSettings.attributes);
@@ -259,7 +272,7 @@ namespace SiteWordsExtractor
                 return decision;
             });
 
-            string globalRtfFilepath = m_reportFolder + "/" + GLOBAL_RFT_FILENAME;
+            string globalRtfFilepath = m_reportFolder + GLOBAL_RFT_FILENAME;
             Html2Rtf globalRtf = new Html2Rtf(globalRtfFilepath, m_appSettings.wordRegex);
             globalRtf.RegisterProcessor(m_htmlProcessor);
 
@@ -286,7 +299,6 @@ namespace SiteWordsExtractor
             globalRtf.UnregisterProcessor();
 
             // create CSV report
-            //createCSVFile(totalWordsCount);
             createCSVFile(globalWordsCount);
 
             updateCrawlingFinished();
@@ -298,16 +310,20 @@ namespace SiteWordsExtractor
             Uri uri = crawledPage.Uri;
             string url = uri.AbsoluteUri.ToString();
             string rtfFilename = buildFileNameFromUrl(uri, ".rtf");
-            string rtfFilepath = m_statsRootFolder + "/" + rtfFilename;
+            string rtfFilepath = m_statsRootFolder + rtfFilename;
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
 
             int wordsCount = 0;
 
             Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, m_appSettings.wordRegex);
-            rtfFile.RegisterProcessor(m_htmlProcessor);
-            m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
-            wordsCount = rtfFile.WordsCount;
-            rtfFile.UnregisterProcessor();
+
+            lock (m_htmlProcessor)
+            {
+                rtfFile.RegisterProcessor(m_htmlProcessor);
+                m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
+                wordsCount = rtfFile.WordsCount;
+                rtfFile.UnregisterProcessor();
+            }
 
             updateListView(url, wordsCount, rtfFilename);
         }
@@ -320,8 +336,17 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            string csvFilepath = m_reportFolder + "/" + m_appSettings.statFilename;
-            StreamWriter csvFile = new StreamWriter(csvFilepath);
+            string csvFilepath = m_reportFolder + m_appSettings.statFilename;
+            StreamWriter csvFile;
+            try
+            {
+                csvFile = new StreamWriter(csvFilepath);
+            }
+            catch (Exception e)
+            {
+                log.Error("Failed to open csv file: " + csvFilepath + ", ERROR: " + e.ToString());
+                return;
+            }
             csvFile.WriteLine("Site: " + siteURL.Text);
             csvFile.WriteLine("Total number of pages: " + listViewResults.Items.Count.ToString());
             csvFile.WriteLine("Total number of words: " + totalWordsCount.ToString());
@@ -449,10 +474,10 @@ namespace SiteWordsExtractor
             m_statsRootFolder = m_appSettings.reportsRootFolder;
             if (String.IsNullOrWhiteSpace(m_statsRootFolder))
             {
-                m_statsRootFolder = "./";
+                m_statsRootFolder = ".\\";
             }
 
-            m_statsRootFolder += domainName;
+            m_statsRootFolder += domainName + "\\";
         }
 
         private void buildReportFolderPathName()
@@ -468,7 +493,7 @@ namespace SiteWordsExtractor
             }
             else
             {
-                m_reportFolder = m_statsRootFolder + "/" + REPROT_FOLDER_NAME;
+                m_reportFolder = m_statsRootFolder + REPROT_FOLDER_NAME;
             }
         }
 
@@ -658,7 +683,7 @@ namespace SiteWordsExtractor
 
             if (m_reportFolder != null)
             {
-                string logFilePath = m_reportFolder + "/" + LOG_FILE_NAME;
+                string logFilePath = m_reportFolder + LOG_FILE_NAME;
                 log.Info("Logging file is: " + logFilePath);
                 changeLogFile(logFilePath);
             }

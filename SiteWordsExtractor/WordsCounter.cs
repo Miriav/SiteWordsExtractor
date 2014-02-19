@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using log4net;
 
 namespace SiteWordsExtractor
 {
     class WordsCounter
     {
+        public static readonly ILog log = LogManager.GetLogger(typeof(WordsCounter));
+
         Regex m_regex;
 
         /*
@@ -18,6 +21,7 @@ namespace SiteWordsExtractor
         public WordsCounter(string pattern)
         {
             m_regex = new Regex(pattern, RegexOptions.None);
+            log.Debug("Build new regular expression: " + pattern);
         }
 
         /*
@@ -27,6 +31,9 @@ namespace SiteWordsExtractor
         {
             MatchCollection matches = m_regex.Matches(s);
             int count = matches.Count;
+
+            log.Debug(count.ToString() + " words in text: " + s);
+
             return count;
         }
 
@@ -38,6 +45,9 @@ namespace SiteWordsExtractor
         {
             MatchCollection matches = Regex.Matches(s, regex);
             int count = matches.Count;
+
+            log.Debug(count.ToString() + " words in text: " + s);
+
             return count;
         }
     }
