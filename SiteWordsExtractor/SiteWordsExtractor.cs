@@ -76,6 +76,8 @@ namespace SiteWordsExtractor
             // initialize the windows form components
             InitializeComponent();
 
+            listViewResults.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
             // load logger configuration
             configLogger();
             log.Info("-------------------");
@@ -210,8 +212,6 @@ namespace SiteWordsExtractor
                 return false;
             }
 
-            createLogFile();
-
             m_backgroundWorker = new BackgroundWorker();
             m_backgroundWorker.DoWork += new DoWorkEventHandler(doWork);
 
@@ -225,8 +225,8 @@ namespace SiteWordsExtractor
             // close log file
             FileInfo exePath = new FileInfo(Application.ExecutablePath);
             string logFilepath = exePath.Directory.FullName + "\\" + LOG_FILE_NAME;
-            changeLogFile(logFilepath);
             log.Info("Done working on site: " + siteURL.Text);
+            log.Info(progressLabel.Text);
 
             // invalidate the reports folder
             m_statsRootFolder = null;
@@ -313,11 +313,10 @@ namespace SiteWordsExtractor
             done();
         }
 
-        private void processCrawledPage(CrawledPage crawledPage)
+        private void processCrawledPage(CrawledPage crawledPage, string rtfFilename)
         {
             Uri uri = crawledPage.Uri;
             string url = WebUtility.UrlDecode(uri.AbsoluteUri.ToString());
-            string rtfFilename = buildFileNameFromUrl(uri, ".rtf");
             string rtfFilepath = m_statsRootFolder + rtfFilename;
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
 
@@ -417,12 +416,13 @@ namespace SiteWordsExtractor
                 updateStatusLine(crawledPage.Uri.AbsoluteUri.ToString());
                 try
                 {
-                    processCrawledPage(crawledPage);
+                    string rtfFilename = buildFileNameFromUrl(crawledPage.Uri, m_linksProcessed + 1, ".rtf");
+                    processCrawledPage(crawledPage, rtfFilename);
                     m_linksProcessed++;
                 }
                 catch (Exception ex)
                 {
-                    log.Error("crawler_PageCrawlCompletedAsync: " + ex.ToString());
+                    log.Error("crawler_PageCrawlCompletedAsync (" + crawledPage.Uri.AbsoluteUri.ToString() + "): " + ex.ToString());
                     m_linksError++;
                 }
             }
@@ -543,35 +543,40 @@ namespace SiteWordsExtractor
             return true;
         }
 
-        private string buildFileNameFromUrl(Uri url, string ext = ".txt")
+        private string buildFileNameFromUrl(Uri uri, int counter, string ext = ".txt")
         {
-            string filename = "";
-
-            filename = url.PathAndQuery;
-            // remove prefixed "/"
-            if (filename.StartsWith("/"))
+            string urlPart = "default";
+            
+            string str = WebUtility.UrlDecode(uri.AbsoluteUri.ToString());
+            int position = str.LastIndexOf('/');
+            if (position != -1)
             {
-                filename = filename.Remove(0, 1);
+                urlPart = str.Substring(position+1);
+                if (String.IsNullOrEmpty(urlPart))
+                {
+                    urlPart = "_";
+                }
             }
-            filename = String.Join(".", filename.Split('/'));
-            filename = filename.Replace('\\', '.');
-            filename = filename.Replace('/', '.');
-            filename = filename.Replace(':', '=');
-            filename = filename.Replace('*', '.');
-            filename = filename.Replace('"', '\'');
-            filename = filename.Replace('<', 'E');
-            filename = filename.Replace('>', '3');
-            filename = filename.Replace('|', '!');
-            filename = filename.Replace('?', '-');
 
-            // TODO: filename should be {%04d}_{%-20s}.rtf where d is "links visited" and s is the (up to) 20 first chars of the filename
-            filename.
-
-            if (filename == String.Empty)
+            if (urlPart.Length > 20)
             {
-                filename = "_";
+                urlPart = urlPart.Substring(0, 20);
             }
-            filename += ext;
+
+            // remove illegal chars from the filename
+            urlPart = urlPart.Replace('\\', '-');
+            urlPart = urlPart.Replace('/', '-');
+            urlPart = urlPart.Replace(':', '.');
+            urlPart = urlPart.Replace('*', '.');
+            urlPart = urlPart.Replace('?', '-');
+            urlPart = urlPart.Replace('"', '\'');
+            urlPart = urlPart.Replace('<', '_');
+            urlPart = urlPart.Replace('>', '_');
+            urlPart = urlPart.Replace('|', '_');
+
+
+            // filename should be {%04d}_{%-20s}.rtf where d is "links visited" and s is the (up to) 20 first chars of the filename
+            string filename = String.Format("{0:0000}{1}{2}", counter, urlPart, ext);
 
             return filename;
         }
@@ -698,59 +703,18 @@ namespace SiteWordsExtractor
             item.SubItems.Add(wordsCount.ToString());
             item.SubItems.Add(filename);
             listViewResults.Items.Add(item);
-            listViewResults.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
 
+        }
+
+        int minimumColumnWidth = 50;
+        private void listViewResults_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        {
+            if (listViewResults.Columns[e.ColumnIndex].Width < minimumColumnWidth)
+            {
+                listViewResults.Columns[e.ColumnIndex].Width = minimumColumnWidth;
+            }
         }
 
         #endregion // UI Update
-
-        #region Logger
-
-        private void createLogFile()
-        {
-            /*
-            if (m_reportFolder == null)
-            {
-                buildReportFolderPathName();
-            }
-
-            if (m_reportFolder != null)
-            {
-                string logFilePath = m_reportFolder + LOG_FILE_NAME;
-                log.Info("Logging file is: " + logFilePath);
-                changeLogFile(logFilePath);
-            }
-             */
-        }
-
-        private void changeLogFile(string logFilepath)
-        {
-            /*
-            log4net.Repository.Hierarchy.Logger logger = (log4net.Repository.Hierarchy.Logger)log.Logger;
-
-            log4net.Repository.Hierarchy.Hierarchy h = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
-            log4net.Appender.IAppender[] appenders = log.Logger.Repository.GetAppenders();
-            foreach (log4net.Appender.IAppender appender in appenders)
-            {
-                if (appender is log4net.Appender.FileAppender)
-                {
-                    log4net.Appender.FileAppender fileAppender = (log4net.Appender.FileAppender)appender;
-                    
-                    if (fileAppender.Name == "FileAppender")
-                    {
-                        logger.RemoveAppender(fileAppender);
-                        fileAppender.File = logFilepath;
-                        fileAppender.ActivateOptions();
-                        logger.AddAppender(fileAppender);
-                        break;
-                    }
-
-                }
-            }
-             */ 
-        }
-                
-        #endregion // Logger
-
     }
 }

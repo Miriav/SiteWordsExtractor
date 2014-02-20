@@ -108,6 +108,7 @@
             this.listViewResults.TabIndex = 11;
             this.listViewResults.UseCompatibleStateImageBehavior = false;
             this.listViewResults.View = System.Windows.Forms.View.Details;
+            this.listViewResults.ColumnWidthChanged += new System.Windows.Forms.ColumnWidthChangedEventHandler(this.listViewResults_ColumnWidthChanged);
             // 
             // url
             // 

@@ -74,7 +74,10 @@ namespace SiteWordsExtractor
         {
             m_rtf.StartNewParagraph();
             m_rtf.AppendText("-- PAGE END. Total words: " + WordsCount.ToString());
-            log.Debug("-- PAGE END. Total words: " + WordsCount.ToString());
+
+            string log_msg = String.Format("-- PAGE END. Total words: {0:0000} file: {1}", WordsCount, m_filename);
+            log.Debug(log_msg);
+
             m_rtf.StartNewParagraph();
         }
 
