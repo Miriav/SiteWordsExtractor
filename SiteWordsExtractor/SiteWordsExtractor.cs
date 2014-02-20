@@ -260,18 +260,28 @@ namespace SiteWordsExtractor
                 {
                     log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
                     decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
-                    fi = new FileInfo(decodedUrl);
-                    ext = fi.Extension;
+                    if (Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
+                    {
+                        fi = new FileInfo(decodedUrl);
+                        ext = fi.Extension;
+                    }
+                    else
+                    {
+                        return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
+                    }
                 }
                 catch (Exception excep)
                 {
                     log.Error("failed to get absolute path of url: " + excep.ToString());
                 }
-                foreach (string notAllowedExt in m_notAllowedFileExtList)
+                if (!String.IsNullOrEmpty(ext))
                 {
-                    if (ext == notAllowedExt)
+                    foreach (string notAllowedExt in m_notAllowedFileExtList)
                     {
-                        return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
+                        if (ext == notAllowedExt)
+                        {
+                            return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
+                        }
                     }
                 }
 
@@ -313,35 +323,33 @@ namespace SiteWordsExtractor
             done();
         }
 
-        private void processCrawledPage(CrawledPage crawledPage, string rtfFilename)
-        {
-            Uri uri = crawledPage.Uri;
-            string url = WebUtility.UrlDecode(uri.AbsoluteUri.ToString());
-            string rtfFilepath = m_statsRootFolder + rtfFilename;
-            HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
+		private void processCrawledPage(CrawledPage crawledPage, string rtfFilename)
+		{
+			Uri uri = crawledPage.Uri;
+			string url = WebUtility.UrlDecode(uri.AbsoluteUri.ToString());
+			string rtfFilepath = m_statsRootFolder + rtfFilename;
+			HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
 
-            int wordsCount = 0;
+			int wordsCount = 0;
 
-            Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, m_appSettings.wordRegex);
+			Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, m_appSettings.wordRegex);
 
-            lock (m_htmlProcessor)
-            {
-                rtfFile.RegisterProcessor(m_htmlProcessor);
-                try
-                {
-                    m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
-                }
-                catch (Exception e)
-                {
-                    log.Error("processCrawledPage: Failed to process HTML page: " + url);
-                    log.Error("processCrawledPage: " + e.ToString());
-                }
-                wordsCount = rtfFile.WordsCount;
-                rtfFile.UnregisterProcessor();
-            }
+			rtfFile.RegisterProcessor(m_htmlProcessor);
+			try
+			{
+				m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
+			}
+			catch (Exception e)
+			{
+				log.Error("processCrawledPage: Failed to process HTML page: " + url);
+				log.Error("processCrawledPage: " + e.ToString());
+			}
+			wordsCount = rtfFile.WordsCount;
+			rtfFile.UnregisterProcessor();
 
-            updateListView(url, wordsCount, rtfFilename);
-        }
+
+			updateListView(url, wordsCount, rtfFilename);
+		}
         
         private void createCSVFile(int totalWordsCount)
         {
@@ -416,9 +424,12 @@ namespace SiteWordsExtractor
                 updateStatusLine(crawledPage.Uri.AbsoluteUri.ToString());
                 try
                 {
-                    string rtfFilename = buildFileNameFromUrl(crawledPage.Uri, m_linksProcessed + 1, ".rtf");
-                    processCrawledPage(crawledPage, rtfFilename);
-                    m_linksProcessed++;
+                    lock (m_htmlProcessor)
+                    {
+                        string rtfFilename = buildFileNameFromUrl(crawledPage.Uri, m_linksProcessed + 1, ".rtf");
+                        processCrawledPage(crawledPage, rtfFilename);
+                        m_linksProcessed++;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -638,7 +649,11 @@ namespace SiteWordsExtractor
 
             if (linksVisited > -1)
             {
-                progressBar.Value = linksVisited;
+                // make sure not above maximum
+                if (linksVisited <= progressBar.Maximum)
+                {
+                    progressBar.Value = linksVisited;
+                }
             }
 
             //progressLabel.Text = "" + m_linksVisited + " (" + m_linksProcessed + "+" + m_linksError + ") / " + m_linksFound;

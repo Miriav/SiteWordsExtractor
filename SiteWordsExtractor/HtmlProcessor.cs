@@ -7,6 +7,7 @@ using System.Net;
 using HtmlAgilityPack;
 using log4net;
 using log4net.Config;
+using System.Text.RegularExpressions;
 
 namespace SiteWordsExtractor
 {
@@ -128,6 +129,7 @@ namespace SiteWordsExtractor
 
         private void FireOnTextEvent(string text)
         {
+            text = RemoveDoubleSpaces(text);
             try
             {
                 log.Debug("FireOnTextEvent: " + text);
@@ -146,6 +148,7 @@ namespace SiteWordsExtractor
 
         private void FireOnBoldTextEvent(string text)
         {
+            text = RemoveDoubleSpaces(text);
             try
             {
                 log.Debug("FireOnBoldTextEvent: " + text);
@@ -182,7 +185,7 @@ namespace SiteWordsExtractor
 
         private void FireOnHyperlinkEvent(string url, string text)
         {
-            // OnHyperlink
+            text = RemoveDoubleSpaces(text);
             try
             {
                 log.Debug("FireOnHyperlinkEvent: url=[" + url + "], text=[" + text + "]");
@@ -371,6 +374,11 @@ namespace SiteWordsExtractor
             }
 
             return type;
+        }
+
+        public static string RemoveDoubleSpaces(string original)
+        {
+            return Regex.Replace(original, @"\s+", " ");
         }
 
     }
