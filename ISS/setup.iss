@@ -2,12 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Site Words Extractor"
-#define MyAppVersion "0.9"
-#define MyAppPublisher "My Company, Inc."
-#define MyAppURL "http://www.example.com/"
+#define MyAppVersion "0.9.1.0"
+#define MyAppPublisher "Hever Translators"
+#define MyAppURL "http://www.translatorspool.com/"
 #define MyAppExeName "SiteWordsExtractor.exe"
 
-#define MyDistFolder "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug" 
+#define MyDistFolder "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Release"
+#define MyProjectFolder "C:\Work\My\SiteWordsExtractor"
 
 
 [Setup]
@@ -22,10 +23,12 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={pf32}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug
+;OutputDir=C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug
+;OutputDir={#MyDistFolder}
+OutputDir={#MyProjectFolder}\ISS
 OutputBaseFilename=SiteWordsExtractorSetup
 Compression=lzma
 SolidCompression=yes
@@ -36,6 +39,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
+
+[Dirs]
+Name: {app}; Permissions: everyone-full
 
 [Files]
 Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\SiteWordsExtractor.exe"; DestDir: "{app}"; Flags: ignoreversion

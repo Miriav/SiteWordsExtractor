@@ -65,6 +65,8 @@ namespace SiteWordsExtractor
 
         private int m_linksFound;
         private int m_linksVisited;
+        private int m_linksProcessed;
+        private int m_linksError;
         private int m_linksSkipped;
 
         #endregion // Counters
@@ -225,6 +227,10 @@ namespace SiteWordsExtractor
             string logFilepath = exePath.Directory.FullName + "\\" + LOG_FILE_NAME;
             changeLogFile(logFilepath);
             log.Info("Done working on site: " + siteURL.Text);
+
+            // invalidate the reports folder
+            m_statsRootFolder = null;
+            m_reportFolder = null;
         }
 
         private void doWork(object sender, DoWorkEventArgs e)
@@ -249,10 +255,12 @@ namespace SiteWordsExtractor
                 CrawlDecision decision = new CrawlDecision();
                 FileInfo fi;
                 string ext = "";
+                string decodedUrl = "";
                 try
                 {
                     log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
-                    fi = new FileInfo(pageToCrawl.Uri.AbsolutePath);
+                    decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
+                    fi = new FileInfo(decodedUrl);
                     ext = fi.Extension;
                 }
                 catch (Exception excep)
@@ -308,7 +316,7 @@ namespace SiteWordsExtractor
         private void processCrawledPage(CrawledPage crawledPage)
         {
             Uri uri = crawledPage.Uri;
-            string url = uri.AbsoluteUri.ToString();
+            string url = WebUtility.UrlDecode(uri.AbsoluteUri.ToString());
             string rtfFilename = buildFileNameFromUrl(uri, ".rtf");
             string rtfFilepath = m_statsRootFolder + rtfFilename;
             HtmlAgilityPack.HtmlDocument htmlDoc = crawledPage.HtmlDocument;
@@ -320,7 +328,15 @@ namespace SiteWordsExtractor
             lock (m_htmlProcessor)
             {
                 rtfFile.RegisterProcessor(m_htmlProcessor);
-                m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
+                try
+                {
+                    m_htmlProcessor.ProcessHtmlPage(url, htmlDoc);
+                }
+                catch (Exception e)
+                {
+                    log.Error("processCrawledPage: Failed to process HTML page: " + url);
+                    log.Error("processCrawledPage: " + e.ToString());
+                }
                 wordsCount = rtfFile.WordsCount;
                 rtfFile.UnregisterProcessor();
             }
@@ -381,11 +397,9 @@ namespace SiteWordsExtractor
             CrawledPage crawledPage = e.CrawledPage;
             string msg;
 
-            m_linksVisited++;
-            updateCrawlingProgress(-1, m_linksVisited, -1);
-
             if (crawledPage.WebException != null || crawledPage.HttpWebResponse.StatusCode != HttpStatusCode.OK)
             {
+                m_linksError++;
                 if (crawledPage.HttpWebResponse != null)
                 {
                     msg = "Failed to crawl to page: " + crawledPage.Uri.AbsoluteUri.ToString() + ", Status: " + crawledPage.HttpWebResponse.StatusCode.ToString();
@@ -401,9 +415,20 @@ namespace SiteWordsExtractor
                 msg = "page visited: " + crawledPage.Uri.AbsoluteUri.ToString();
                 log.Debug(msg);
                 updateStatusLine(crawledPage.Uri.AbsoluteUri.ToString());
-                processCrawledPage(crawledPage);
-                //CountWordsOnPage(crawledPage);
+                try
+                {
+                    processCrawledPage(crawledPage);
+                    m_linksProcessed++;
+                }
+                catch (Exception ex)
+                {
+                    log.Error("crawler_PageCrawlCompletedAsync: " + ex.ToString());
+                    m_linksError++;
+                }
             }
+
+            m_linksVisited++;
+            updateCrawlingProgress(-1, m_linksVisited, -1);
         }
 
         void crawler_PageCrawlDisallowedAsync(object sender, PageCrawlDisallowedArgs e)
@@ -538,6 +563,10 @@ namespace SiteWordsExtractor
             filename = filename.Replace('>', '3');
             filename = filename.Replace('|', '!');
             filename = filename.Replace('?', '-');
+
+            // TODO: filename should be {%04d}_{%-20s}.rtf where d is "links visited" and s is the (up to) 20 first chars of the filename
+            filename.
+
             if (filename == String.Empty)
             {
                 filename = "_";
@@ -572,6 +601,8 @@ namespace SiteWordsExtractor
             m_linksFound = 0;
             m_linksSkipped = 0;
             m_linksVisited = 0;
+            m_linksProcessed = 0;
+            m_linksError = 0;
 
             progressBar.Minimum = 0;
             progressBar.Value = 0;
@@ -605,7 +636,8 @@ namespace SiteWordsExtractor
                 progressBar.Value = linksVisited;
             }
 
-            progressLabel.Text = "" + m_linksVisited + "/" + m_linksFound;
+            //progressLabel.Text = "" + m_linksVisited + " (" + m_linksProcessed + "+" + m_linksError + ") / " + m_linksFound;
+            progressLabel.Text = "" + m_linksFound + " links found. " + m_linksVisited + " visited (" + m_linksProcessed + " processed + " + m_linksError + " error)";
         }
 
         private void updateCrawlingFinished()
@@ -676,6 +708,7 @@ namespace SiteWordsExtractor
 
         private void createLogFile()
         {
+            /*
             if (m_reportFolder == null)
             {
                 buildReportFolderPathName();
@@ -687,10 +720,12 @@ namespace SiteWordsExtractor
                 log.Info("Logging file is: " + logFilePath);
                 changeLogFile(logFilePath);
             }
+             */
         }
 
         private void changeLogFile(string logFilepath)
         {
+            /*
             log4net.Repository.Hierarchy.Logger logger = (log4net.Repository.Hierarchy.Logger)log.Logger;
 
             log4net.Repository.Hierarchy.Hierarchy h = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
@@ -712,6 +747,7 @@ namespace SiteWordsExtractor
 
                 }
             }
+             */ 
         }
                 
         #endregion // Logger
