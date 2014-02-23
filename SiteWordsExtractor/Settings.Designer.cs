@@ -313,7 +313,7 @@
             0,
             0});
             this.maxPagesPerSite.Minimum = new decimal(new int[] {
-            100,
+            1,
             0,
             0,
             0});

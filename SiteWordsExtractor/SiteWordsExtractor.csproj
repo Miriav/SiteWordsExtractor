@@ -84,6 +84,7 @@
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="SitePageRequester.cs" />
     <Compile Include="SiteWordsExtractor.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -245,7 +245,7 @@ namespace SiteWordsExtractor
             crawlConfig.MaxCrawlDepth = m_appSettings.maxSiteDepth;
             //crawlConfig.MinCrawlDelayPerDomainMilliSeconds = m_appSettings.minHTTPdelayMs;
 
-            PoliteWebCrawler crawler = new PoliteWebCrawler(crawlConfig, null, null, null, null, null, null, null, null);
+            PoliteWebCrawler crawler = new PoliteWebCrawler(crawlConfig, null, null, null, new SitePageRequester(crawlConfig), null, null, null, null);
             crawler.PageCrawlStartingAsync += crawler_PageCrawlStartingAsync;
             crawler.PageCrawlCompletedAsync += crawler_PageCrawlCompletedAsync;
             crawler.PageCrawlDisallowedAsync += crawler_PageCrawlDisallowedAsync;
@@ -347,10 +347,9 @@ namespace SiteWordsExtractor
 			wordsCount = rtfFile.WordsCount;
 			rtfFile.UnregisterProcessor();
 
-
 			updateListView(url, wordsCount, rtfFilename);
 		}
-        
+
         private void createCSVFile(int totalWordsCount)
         {
             if (InvokeRequired)
