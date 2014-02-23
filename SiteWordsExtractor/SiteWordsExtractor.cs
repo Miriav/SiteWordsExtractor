@@ -174,6 +174,13 @@ namespace SiteWordsExtractor
         {
             // TODO: validate settings
 
+            string url = siteURL.Text;
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            {
+                url = "http://" + url;
+            }
+            siteURL.Text = url;
+
             // validate root dir
             string rootDir = m_appSettings.reportsRootFolder;
             if (String.IsNullOrWhiteSpace(rootDir))
