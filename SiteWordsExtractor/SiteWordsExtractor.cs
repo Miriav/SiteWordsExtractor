@@ -44,7 +44,6 @@ namespace SiteWordsExtractor
         #region Constants
 
         private const string REPROT_FOLDER_NAME = "Report\\";
-        private const string LOG_FILE_NAME = "log.txt";
         private const string GLOBAL_RFT_FILENAME = "report.rtf";
 
         #endregion // Constants
@@ -109,6 +108,14 @@ namespace SiteWordsExtractor
 
         private void settingsButton_Click(object sender, EventArgs e)
         {
+            SettingsDialog dlg = new SettingsDialog();
+            dlg.Settings = m_appSettings;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("OK");
+            }
+
+            return;
             Settings settingsDlg = new Settings();
             settingsDlg.SetAppSettings(m_appSettings);
 
@@ -230,8 +237,6 @@ namespace SiteWordsExtractor
         private void done()
         {
             // close log file
-            FileInfo exePath = new FileInfo(Application.ExecutablePath);
-            string logFilepath = exePath.Directory.FullName + "\\" + LOG_FILE_NAME;
             log.Info("Done working on site: " + siteURL.Text);
             log.Info(progressLabel.Text);
 
@@ -257,45 +262,7 @@ namespace SiteWordsExtractor
             crawler.PageCrawlCompletedAsync += crawler_PageCrawlCompletedAsync;
             crawler.PageCrawlDisallowedAsync += crawler_PageCrawlDisallowedAsync;
             crawler.PageLinksCrawlDisallowedAsync += crawler_PageLinksCrawlDisallowedAsync;
-            crawler.ShouldCrawlPage((pageToCrawl, crawlContext) =>
-            {
-                CrawlDecision decision = new CrawlDecision();
-                FileInfo fi;
-                string ext = "";
-                string decodedUrl = "";
-                try
-                {
-                    log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
-                    decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
-                    if (Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
-                    {
-                        fi = new FileInfo(decodedUrl);
-                        ext = fi.Extension;
-                    }
-                    else
-                    {
-                        return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
-                    }
-                }
-                catch (Exception excep)
-                {
-                    log.Error("failed to get absolute path of url: " + excep.ToString());
-                }
-                if (!String.IsNullOrEmpty(ext))
-                {
-                    foreach (string notAllowedExt in m_notAllowedFileExtList)
-                    {
-                        if (ext == notAllowedExt)
-                        {
-                            return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
-                        }
-                    }
-                }
-
-                decision = new CrawlDecision { Allow = true };
-
-                return decision;
-            });
+            crawler.ShouldCrawlPage(crawler_ShouldCrawlPage);
 
             string globalRtfFilepath = m_reportFolder + GLOBAL_RFT_FILENAME;
             Html2Rtf globalRtf = new Html2Rtf(globalRtfFilepath, m_appSettings.wordRegex);
@@ -470,6 +437,46 @@ namespace SiteWordsExtractor
 
             msg = "Did not crawl the links on page " + crawledPage.Uri.AbsoluteUri.ToString() + " due to " + e.DisallowedReason.ToString();
             log.Warn(msg);
+        }
+
+        CrawlDecision crawler_ShouldCrawlPage(PageToCrawl pageToCrawl, CrawlContext crawlContext)
+        {
+            CrawlDecision decision = new CrawlDecision();
+            FileInfo fi;
+            string ext = "";
+            string decodedUrl = "";
+            try
+            {
+                log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
+                decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
+                if (Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
+                {
+                    fi = new FileInfo(decodedUrl);
+                    ext = fi.Extension;
+                }
+                else
+                {
+                    return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
+                }
+            }
+            catch (Exception excep)
+            {
+                log.Error("failed to get absolute path of url: " + excep.ToString());
+            }
+            if (!String.IsNullOrEmpty(ext))
+            {
+                foreach (string notAllowedExt in m_notAllowedFileExtList)
+                {
+                    if (ext == notAllowedExt)
+                    {
+                        return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
+                    }
+                }
+            }
+
+            decision = new CrawlDecision { Allow = true };
+
+            return decision;
         }
 
         #endregion // Crawler Callbacks

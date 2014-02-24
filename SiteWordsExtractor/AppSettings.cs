@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using ESCommon.Rtf;
 
 namespace SiteWordsExtractor
 {
@@ -11,16 +13,11 @@ namespace SiteWordsExtractor
     {
         public class ApplicationSettings
         {
-            public Version Version = Assembly.GetExecutingAssembly().GetName().Version;
-
+            public readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
             public string ReportsRootFolder = "";
-
             public string StatisticsFilename = "statistics.csv";
-
-
+            public string ReportsFolderName = "Report";
         }
-
-        public ApplicationSettings Application = new ApplicationSettings();
 
         public class HtmlSettings
         {
@@ -35,18 +32,45 @@ namespace SiteWordsExtractor
         public class CrawlerSettings
         {
             public int MaxConcurrentThreads = 10;
-            public int MaxPagesToCrawl = 10;
+            public int MaxPagesToCrawl = 9999;
             public string UserAgentString = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36";
             public int HttpRequestMaxAutoRedirects = 7;
-            public int MaxCrawlDepth = 9999;
+            public int MaxCrawlDepth = 10;
 
             public string RegExDenyURLs = @"\.jpg|\.zip|\.pdf";
         }
 
-        public class WordsCounterSEttings
+        public class WordsCounterSettings
         {
             public string RegEx = @"[^\s\.\$\^\{\[\(\|\)\*\+\?\\!@#%&_=;:'""`~<>\-\/]+";
         }
+
+        public class RtfSettings
+        {
+            public string RtfReportFilename = "report.rtf";
+            public string RtfReportBaseFilename = "report_";
+            public int RtfNumberOfPagesInReport = 100;
+            public int SpaceAfterParagraph = 6;
+
+            public string TextFontName = "Calibri";
+            public int TextFontSize = 12;
+            public string TextFontColor = ColorTranslator.ToHtml(Color.Black);
+
+            public string AttributeFontName = "Calibri";
+            public int AttributeFontSize = 12;
+            public string AttributeFontColor = ColorTranslator.ToHtml(Color.Gray);
+
+            public string HyperlinkFontName = "Calibri";
+            public int HyperlinkFontSize = 12;
+            public string HyperlinkFontColor = ColorTranslator.ToHtml(Color.Blue);
+        }
+
+        public ApplicationSettings Application = new ApplicationSettings();
+        public HtmlSettings Html = new HtmlSettings();
+        public CrawlerSettings Crawler = new CrawlerSettings();
+        public WordsCounterSettings WordsCounter = new WordsCounterSettings();
+        public RtfSettings Rtf = new RtfSettings();
+        
 
         #region Application Settings
 
