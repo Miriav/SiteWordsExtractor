@@ -22,6 +22,11 @@ namespace SiteWordsExtractor
         private int m_defaultColorIndex = 1;
         private float m_defaultSpaceAfter = 6f;
 
+        public RtfDocument RtfDoc
+        {
+            get { return m_doc; }
+        }
+
         public RtfPageBuilder(string filepath)
         {
             m_strFilepath = filepath;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using ESCommon.Rtf;
 
 namespace SiteWordsExtractor
 {
@@ -21,6 +22,11 @@ namespace SiteWordsExtractor
         public int WordsCount
         {
             get { return m_wordsCount; }
+        }
+
+        public RtfDocument RtfDoc
+        {
+            get { return m_rtf.RtfDoc; }
         }
 
         public Html2Rtf(string filepath, string wordsRegex)

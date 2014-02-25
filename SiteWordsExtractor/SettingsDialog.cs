@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -25,7 +26,6 @@ namespace SiteWordsExtractor
                 UpdateAllHtmlTags();
                 UpdateUI();
             }
-
         }
 
         public SettingsDialog()
@@ -69,6 +69,8 @@ namespace SiteWordsExtractor
         private void UpdateUI()
         {
             // Application tab
+            string ver = m_appSettings.Application.Version.ToString();
+            ApplicationVersion.Text = String.Format("Application version: {0}", m_appSettings.Application.Version.ToString());
             ReportsRootFolder.Text = m_appSettings.Application.ReportsRootFolder;
             StatisticsFilename.Text = m_appSettings.Application.StatisticsFilename;
             ReportsFolderName.Text = m_appSettings.Application.ReportsFolderName;
@@ -88,6 +90,7 @@ namespace SiteWordsExtractor
             MaxRedirections.Value = m_appSettings.Crawler.HttpRequestMaxAutoRedirects;
             MaxSiteDepth.Value = m_appSettings.Crawler.MaxCrawlDepth;
             UserAgentString.Text = m_appSettings.Crawler.UserAgentString;
+            PopulateCrawlerPatterns(m_appSettings.Crawler.RegExDenyURLs);
 
             // Words counter tab
             WordsCounterRegex.Text = m_appSettings.WordsCounter.RegEx;
@@ -98,47 +101,82 @@ namespace SiteWordsExtractor
             UpdateRtfFilenameExample();
             SpacesAfterParagraph.Value = m_appSettings.Rtf.SpaceAfterParagraph;
 
-            TextFontSize.Value = m_appSettings.Rtf.TextFontSize;
-            TextFontColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.TextFontColor);
+            buttonTextColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.TextFont.Color);
+            buttonAttributeColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.AttributeFont.Color);
+            buttonLinkColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.HyperlinkFont.Color);
+
             UpdateTextFontExample();
+        }
 
-            AttributeFontSize.Value = m_appSettings.Rtf.AttributeFontSize;
-            AttributeFontColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.AttributeFontColor);
+        private void UpdateAppSettings()
+        {
+            // Application tab
+            m_appSettings.Application.ReportsRootFolder = ReportsRootFolder.Text;
+            m_appSettings.Application.StatisticsFilename = StatisticsFilename.Text;
+            m_appSettings.Application.ReportsFolderName = ReportsFolderName.Text;
 
-            LinksFontSize.Value = m_appSettings.Rtf.HyperlinkFontSize;
-            LinksFontColor.BackColor = ColorTranslator.FromHtml(m_appSettings.Rtf.HyperlinkFontColor);
+            // HTML tab
+            PopulateListBox(listBoxHtmlTags, AllHtmlTags);
+            m_appSettings.Html.ParagraphTags = GetCommaSeperatedValues(listBoxParagraphTags);
+            m_appSettings.Html.BoldTextTags = GetCommaSeperatedValues(listBoxBoldTextTags);
+            m_appSettings.Html.InputTags = GetCommaSeperatedValues(listBoxInputTags);
+            m_appSettings.Html.HyperlinkTags = GetCommaSeperatedValues(listBoxHyperlinkTags);
+            m_appSettings.Html.IgnoredTags = GetCommaSeperatedValues(listBoxIgnoreTags);
+            m_appSettings.Html.Attributes = GetCommaSeperatedValues(listBoxAttributes);
 
+            // Crawler tab
+            m_appSettings.Crawler.MaxConcurrentThreads = (int)MaxConcurrentDownloads.Value;
+            m_appSettings.Crawler.MaxPagesToCrawl = (int)MaxPagesToCrawl.Value;
+            m_appSettings.Crawler.HttpRequestMaxAutoRedirects = (int)MaxRedirections.Value;
+            m_appSettings.Crawler.MaxCrawlDepth = (int)MaxSiteDepth.Value;
+            m_appSettings.Crawler.UserAgentString = UserAgentString.Text;
+            m_appSettings.Crawler.RegExDenyURLs = GetCrawlerPatterns();
+
+            // Words counter tab
+            m_appSettings.WordsCounter.RegEx = WordsCounterRegex.Text;
+
+            // Rtf tab
+            m_appSettings.Rtf.RtfReportBaseFilename = RtfBaseFilename.Text;
+            m_appSettings.Rtf.RtfNumberOfPagesInReport = (int)RtfNumberOfPagesInReport.Value;
+            m_appSettings.Rtf.SpaceAfterParagraph = (int)SpacesAfterParagraph.Value;
+            // fonts and colors updated directly while editing
         }
 
         private void UpdateRtfFilenameExample()
         {
-            RtfPagesExample.Text = String.Format("Example: {0}{1}, {0}{2}", RtfBaseFilename.Text, 0, RtfNumberOfPagesInReport.Value);
+            RtfPagesExample.Text = String.Format("Example: {0}{1}-{2}.rtf, {0}{3}-{4}.rtf", RtfBaseFilename.Text, 0, RtfNumberOfPagesInReport.Value - 1, RtfNumberOfPagesInReport.Value, RtfNumberOfPagesInReport.Value*2 - 1);
         }
 
         private void UpdateTextFontExample()
         {
-            // TODO: clear the textbox first
-            TextFontExample.Text = String.Empty;
+            // clear the textbox first
+            RtfExample.Text = String.Empty;
 
-            //float fontSize = (float)TextFontSize.Value;
-            float fontSize = 8f;
-            TextFontExample.Font = new Font("Microsoft Sans Serif", fontSize, FontStyle.Regular);
-            TextFontExample.SelectionColor = TextFontColor.BackColor;
-            TextFontExample.AppendText("Regular text\n");
-            /*
-            TextFontExample.Font = new Font("Calibri", fontSize, FontStyle.Bold);
-            TextFontExample.SelectionColor = TextFontColor.BackColor;
-            TextFontExample.AppendText("Bold text");
-             */
-        }
+            Font textFont = new Font(m_appSettings.Rtf.TextFont.Name, m_appSettings.Rtf.TextFont.Size, m_appSettings.Rtf.TextFont.Style);
+            Font boldFont = new Font(textFont.Name, textFont.Size, FontStyle.Bold);
+            Font attFont = new Font(m_appSettings.Rtf.AttributeFont.Name, m_appSettings.Rtf.AttributeFont.Size, m_appSettings.Rtf.AttributeFont.Style);
+            Font linkFont = new Font(m_appSettings.Rtf.HyperlinkFont.Name, m_appSettings.Rtf.HyperlinkFont.Size, m_appSettings.Rtf.HyperlinkFont.Style);
 
-        private void UpdateSettings()
-        {
+            RtfExample.SelectionFont = textFont;
+            RtfExample.SelectionColor = ColorTranslator.FromHtml(m_appSettings.Rtf.TextFont.Color);
+            RtfExample.AppendText("Regular text\n");
+
+            RtfExample.SelectionFont = boldFont;
+            RtfExample.SelectionColor = ColorTranslator.FromHtml(m_appSettings.Rtf.TextFont.Color);
+            RtfExample.AppendText("Bold text\n");
+
+            RtfExample.SelectionFont = attFont;
+            RtfExample.SelectionColor = ColorTranslator.FromHtml(m_appSettings.Rtf.AttributeFont.Color);
+            RtfExample.AppendText("Attribute\n");
+
+            RtfExample.SelectionFont = linkFont;
+            RtfExample.SelectionColor = ColorTranslator.FromHtml(m_appSettings.Rtf.HyperlinkFont.Color);
+            RtfExample.AppendText("This is a link\n");
         }
 
         private void buttonSaveAndExit_Click(object sender, EventArgs e)
         {
-            UpdateSettings();
+            UpdateAppSettings();
             AppSettingsStorage.Save(m_appSettings);
         }
 
@@ -157,6 +195,29 @@ namespace SiteWordsExtractor
             }
         }
 
+        private void PopulateCrawlerPatterns(string verticalBarSeperatedList)
+        {
+            crawlerPatterns.Items.Clear();
+            List<string> patterns = new List<string>(verticalBarSeperatedList.Split('|'));
+            foreach (string item in patterns)
+            {
+                crawlerPatterns.Items.Add(item);
+            }
+        }
+
+        private string GetCrawlerPatterns()
+        {
+            string verticalBarSeperatedList = "";
+            List<string> patterns = new List<string>();
+            foreach (object item in crawlerPatterns.Items)
+            {
+                patterns.Add((string)item);
+            }
+            verticalBarSeperatedList = String.Join("|", patterns);
+
+            return verticalBarSeperatedList;
+        }
+
         private void PopulateListBox(ListBox listBox, string commaSeperatedValues)
         {
             listBox.Items.Clear();
@@ -165,6 +226,19 @@ namespace SiteWordsExtractor
             {
                 listBox.Items.Add(item);
             }
+        }
+
+        private string GetCommaSeperatedValues(ListBox listBox)
+        {
+            string commaSeperatedValues = "";
+            List<string> values = new List<string>();
+            foreach (object item in listBox.Items)
+            {
+                values.Add((string)item);
+            }
+            commaSeperatedValues = String.Join(",", values);
+
+            return commaSeperatedValues;
         }
 
         private void MoveSelectedItem(ListBox fromBox, ListBox toBox)
@@ -259,6 +333,127 @@ namespace SiteWordsExtractor
         private void RtfBaseFilename_TextChanged(object sender, EventArgs e)
         {
             UpdateRtfFilenameExample();
+        }
+
+        private void TextFontSize_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTextFontExample();
+            FontDialog fontDlg = new FontDialog();
+            fontDlg.ShowEffects = false;
+            if (fontDlg.ShowDialog() == DialogResult.OK)
+            {
+                string msg = "Name=" + fontDlg.Font.Name;
+                msg += ", size=" + fontDlg.Font.SizeInPoints;
+                msg += ", color=" + fontDlg.Color.ToString();
+                MessageBox.Show(msg);
+            }
+        }
+
+        private void buttonTextFont_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDlg = new FontDialog();
+            fontDlg.ShowEffects = false;
+            fontDlg.Font = new Font(m_appSettings.Rtf.TextFont.Name, m_appSettings.Rtf.TextFont.Size, m_appSettings.Rtf.TextFont.Style);
+            if (fontDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.TextFont.Name = fontDlg.Font.Name;
+                m_appSettings.Rtf.TextFont.Size = fontDlg.Font.Size;
+                m_appSettings.Rtf.TextFont.Style = fontDlg.Font.Style;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonAttributeFont_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDlg = new FontDialog();
+            fontDlg.ShowEffects = false;
+            fontDlg.Font = new Font(m_appSettings.Rtf.AttributeFont.Name, m_appSettings.Rtf.AttributeFont.Size, m_appSettings.Rtf.AttributeFont.Style);
+            if (fontDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.AttributeFont.Name = fontDlg.Font.Name;
+                m_appSettings.Rtf.AttributeFont.Size = fontDlg.Font.Size;
+                m_appSettings.Rtf.AttributeFont.Style = fontDlg.Font.Style;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonLinkFont_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDlg = new FontDialog();
+            fontDlg.ShowEffects = false;
+            fontDlg.Font = new Font(m_appSettings.Rtf.HyperlinkFont.Name, m_appSettings.Rtf.HyperlinkFont.Size, m_appSettings.Rtf.HyperlinkFont.Style);
+            if (fontDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.HyperlinkFont.Name = fontDlg.Font.Name;
+                m_appSettings.Rtf.HyperlinkFont.Size = fontDlg.Font.Size;
+                m_appSettings.Rtf.HyperlinkFont.Style = fontDlg.Font.Style;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonTextColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = ColorTranslator.FromHtml(m_appSettings.Rtf.TextFont.Color);
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.TextFont.Color = ColorTranslator.ToHtml(colorDlg.Color);
+                buttonTextColor.BackColor = colorDlg.Color;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonAttributeColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = ColorTranslator.FromHtml(m_appSettings.Rtf.AttributeFont.Color);
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.AttributeFont.Color = ColorTranslator.ToHtml(colorDlg.Color);
+                buttonAttributeColor.BackColor = colorDlg.Color;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonLinkColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = ColorTranslator.FromHtml(m_appSettings.Rtf.HyperlinkFont.Color);
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_appSettings.Rtf.HyperlinkFont.Color = ColorTranslator.ToHtml(colorDlg.Color);
+                buttonLinkColor.BackColor = colorDlg.Color;
+                UpdateTextFontExample();
+            }
+        }
+
+        private void buttonCrawlerPatternAdd_Click(object sender, EventArgs e)
+        {
+            string pattern = crawlerNewPatternValue.Text;
+            pattern = pattern.Trim();
+            if (String.IsNullOrWhiteSpace(pattern))
+            {
+                return;
+            }
+
+            pattern = pattern.ToLower();
+
+            if (crawlerPatterns.Items.Contains(pattern))
+            {
+                return;
+            }
+
+            crawlerPatterns.Items.Add(pattern);
+        }
+
+        private void buttonCrawlerPatternRemove_Click(object sender, EventArgs e)
+        {
+            if (crawlerPatterns.SelectedIndex > -1)
+            {
+                object selected = crawlerPatterns.Items[crawlerPatterns.SelectedIndex];
+                crawlerPatterns.Items.Remove(selected);
+                crawlerNewPatternValue.Text = (string)selected;
+            }
         }
 
 

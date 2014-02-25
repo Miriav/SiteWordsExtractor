@@ -34,7 +34,7 @@
             this.ReportsFolderName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.StatisticsFilename = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.ApplicationVersion = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.buttonBrowseRootFolder = new System.Windows.Forms.Button();
             this.ReportsRootFolder = new System.Windows.Forms.TextBox();
@@ -68,7 +68,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.listBoxHtmlTags = new System.Windows.Forms.ListBox();
             this.tabCrawlerSettings = new System.Windows.Forms.TabPage();
-            this.crawlerNewPatternType = new System.Windows.Forms.ComboBox();
+            this.buttonCrawlerPatternRemove = new System.Windows.Forms.Button();
+            this.buttonCrawlerPatternAdd = new System.Windows.Forms.Button();
             this.crawlerPatterns = new System.Windows.Forms.ListBox();
             this.crawlerNewPatternValue = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
@@ -86,24 +87,15 @@
             this.WordsCounterRegex = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.tabRtfSettings = new System.Windows.Forms.TabPage();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.LinksFontColor = new System.Windows.Forms.TextBox();
-            this.LinksFontSize = new System.Windows.Forms.NumericUpDown();
-            this.LinksFontExample = new System.Windows.Forms.RichTextBox();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label26 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.AttributeFontColor = new System.Windows.Forms.TextBox();
-            this.AttributeFontSize = new System.Windows.Forms.NumericUpDown();
-            this.AttributeFontExample = new System.Windows.Forms.RichTextBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.buttonLinkColor = new System.Windows.Forms.Button();
+            this.buttonTextColor = new System.Windows.Forms.Button();
             this.label21 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.TextFontColor = new System.Windows.Forms.TextBox();
-            this.TextFontSize = new System.Windows.Forms.NumericUpDown();
-            this.TextFontExample = new System.Windows.Forms.RichTextBox();
-            this.label23 = new System.Windows.Forms.Label();
-            this.label22 = new System.Windows.Forms.Label();
+            this.buttonAttributeColor = new System.Windows.Forms.Button();
+            this.buttonLinkFont = new System.Windows.Forms.Button();
+            this.buttonAttributeFont = new System.Windows.Forms.Button();
+            this.buttonTextFont = new System.Windows.Forms.Button();
+            this.RtfExample = new System.Windows.Forms.RichTextBox();
             this.SpacesAfterParagraph = new System.Windows.Forms.NumericUpDown();
             this.label20 = new System.Windows.Forms.Label();
             this.RtfNumberOfPagesInReport = new System.Windows.Forms.NumericUpDown();
@@ -114,8 +106,6 @@
             this.buttonSaveAndExit = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
-            this.buttonCrawlerPatternAdd = new System.Windows.Forms.Button();
-            this.buttonCrawlerPatternRemove = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabApplicationSettings.SuspendLayout();
             this.tabHtmlSettings.SuspendLayout();
@@ -126,12 +116,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.MaxConcurrentDownloads)).BeginInit();
             this.tabWordsCounterSettings.SuspendLayout();
             this.tabRtfSettings.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LinksFontSize)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.AttributeFontSize)).BeginInit();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TextFontSize)).BeginInit();
+            this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SpacesAfterParagraph)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RtfNumberOfPagesInReport)).BeginInit();
             this.SuspendLayout();
@@ -158,7 +143,7 @@
             this.tabApplicationSettings.Controls.Add(this.ReportsFolderName);
             this.tabApplicationSettings.Controls.Add(this.label3);
             this.tabApplicationSettings.Controls.Add(this.StatisticsFilename);
-            this.tabApplicationSettings.Controls.Add(this.textBox2);
+            this.tabApplicationSettings.Controls.Add(this.ApplicationVersion);
             this.tabApplicationSettings.Controls.Add(this.label2);
             this.tabApplicationSettings.Controls.Add(this.buttonBrowseRootFolder);
             this.tabApplicationSettings.Controls.Add(this.ReportsRootFolder);
@@ -193,17 +178,17 @@
             this.StatisticsFilename.Size = new System.Drawing.Size(196, 20);
             this.StatisticsFilename.TabIndex = 5;
             // 
-            // textBox2
+            // ApplicationVersion
             // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.ApplicationVersion.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox2.Location = new System.Drawing.Point(9, 7);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(337, 13);
-            this.textBox2.TabIndex = 4;
-            this.textBox2.Text = "Application Version: 0.9.4.0";
+            this.ApplicationVersion.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ApplicationVersion.Location = new System.Drawing.Point(9, 7);
+            this.ApplicationVersion.Name = "ApplicationVersion";
+            this.ApplicationVersion.ReadOnly = true;
+            this.ApplicationVersion.Size = new System.Drawing.Size(337, 13);
+            this.ApplicationVersion.TabIndex = 4;
+            this.ApplicationVersion.Text = "Application Version: 0.9.4.0";
             // 
             // label2
             // 
@@ -540,7 +525,6 @@
             this.tabCrawlerSettings.BackColor = System.Drawing.SystemColors.Control;
             this.tabCrawlerSettings.Controls.Add(this.buttonCrawlerPatternRemove);
             this.tabCrawlerSettings.Controls.Add(this.buttonCrawlerPatternAdd);
-            this.tabCrawlerSettings.Controls.Add(this.crawlerNewPatternType);
             this.tabCrawlerSettings.Controls.Add(this.crawlerPatterns);
             this.tabCrawlerSettings.Controls.Add(this.crawlerNewPatternValue);
             this.tabCrawlerSettings.Controls.Add(this.label17);
@@ -561,17 +545,25 @@
             this.tabCrawlerSettings.TabIndex = 2;
             this.tabCrawlerSettings.Text = "Crawler";
             // 
-            // crawlerNewPatternType
+            // buttonCrawlerPatternRemove
             // 
-            this.crawlerNewPatternType.FormattingEnabled = true;
-            this.crawlerNewPatternType.Items.AddRange(new object[] {
-            "Contains",
-            "Starts with",
-            "Ends with"});
-            this.crawlerNewPatternType.Location = new System.Drawing.Point(10, 171);
-            this.crawlerNewPatternType.Name = "crawlerNewPatternType";
-            this.crawlerNewPatternType.Size = new System.Drawing.Size(96, 21);
-            this.crawlerNewPatternType.TabIndex = 13;
+            this.buttonCrawlerPatternRemove.Location = new System.Drawing.Point(158, 195);
+            this.buttonCrawlerPatternRemove.Name = "buttonCrawlerPatternRemove";
+            this.buttonCrawlerPatternRemove.Size = new System.Drawing.Size(40, 23);
+            this.buttonCrawlerPatternRemove.TabIndex = 15;
+            this.buttonCrawlerPatternRemove.Text = "/\\";
+            this.buttonCrawlerPatternRemove.UseVisualStyleBackColor = true;
+            this.buttonCrawlerPatternRemove.Click += new System.EventHandler(this.buttonCrawlerPatternRemove_Click);
+            // 
+            // buttonCrawlerPatternAdd
+            // 
+            this.buttonCrawlerPatternAdd.Location = new System.Drawing.Point(112, 195);
+            this.buttonCrawlerPatternAdd.Name = "buttonCrawlerPatternAdd";
+            this.buttonCrawlerPatternAdd.Size = new System.Drawing.Size(40, 23);
+            this.buttonCrawlerPatternAdd.TabIndex = 14;
+            this.buttonCrawlerPatternAdd.Text = "\\/";
+            this.buttonCrawlerPatternAdd.UseVisualStyleBackColor = true;
+            this.buttonCrawlerPatternAdd.Click += new System.EventHandler(this.buttonCrawlerPatternAdd_Click);
             // 
             // crawlerPatterns
             // 
@@ -583,9 +575,9 @@
             // 
             // crawlerNewPatternValue
             // 
-            this.crawlerNewPatternValue.Location = new System.Drawing.Point(112, 172);
+            this.crawlerNewPatternValue.Location = new System.Drawing.Point(10, 172);
             this.crawlerNewPatternValue.Name = "crawlerNewPatternValue";
-            this.crawlerNewPatternValue.Size = new System.Drawing.Size(234, 20);
+            this.crawlerNewPatternValue.Size = new System.Drawing.Size(336, 20);
             this.crawlerNewPatternValue.TabIndex = 11;
             // 
             // label17
@@ -593,9 +585,9 @@
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(7, 155);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(128, 13);
+            this.label17.Size = new System.Drawing.Size(133, 13);
             this.label17.TabIndex = 10;
-            this.label17.Text = "Ignore URLs with pattern:";
+            this.label17.Text = "Ignore URLs that includes:";
             // 
             // UserAgentString
             // 
@@ -753,9 +745,7 @@
             // tabRtfSettings
             // 
             this.tabRtfSettings.BackColor = System.Drawing.SystemColors.Control;
-            this.tabRtfSettings.Controls.Add(this.groupBox3);
-            this.tabRtfSettings.Controls.Add(this.groupBox2);
-            this.tabRtfSettings.Controls.Add(this.groupBox1);
+            this.tabRtfSettings.Controls.Add(this.groupBox4);
             this.tabRtfSettings.Controls.Add(this.SpacesAfterParagraph);
             this.tabRtfSettings.Controls.Add(this.label20);
             this.tabRtfSettings.Controls.Add(this.RtfNumberOfPagesInReport);
@@ -770,182 +760,102 @@
             this.tabRtfSettings.TabIndex = 4;
             this.tabRtfSettings.Text = "RTF";
             // 
-            // groupBox3
+            // groupBox4
             // 
-            this.groupBox3.Controls.Add(this.LinksFontColor);
-            this.groupBox3.Controls.Add(this.LinksFontSize);
-            this.groupBox3.Controls.Add(this.LinksFontExample);
-            this.groupBox3.Controls.Add(this.label25);
-            this.groupBox3.Controls.Add(this.label26);
-            this.groupBox3.Location = new System.Drawing.Point(7, 275);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(238, 78);
-            this.groupBox3.TabIndex = 9;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Links";
+            this.groupBox4.Controls.Add(this.buttonLinkColor);
+            this.groupBox4.Controls.Add(this.buttonTextColor);
+            this.groupBox4.Controls.Add(this.label21);
+            this.groupBox4.Controls.Add(this.buttonAttributeColor);
+            this.groupBox4.Controls.Add(this.buttonLinkFont);
+            this.groupBox4.Controls.Add(this.buttonAttributeFont);
+            this.groupBox4.Controls.Add(this.buttonTextFont);
+            this.groupBox4.Controls.Add(this.RtfExample);
+            this.groupBox4.Location = new System.Drawing.Point(6, 117);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(340, 128);
+            this.groupBox4.TabIndex = 10;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Fonts";
             // 
-            // LinksFontColor
+            // buttonLinkColor
             // 
-            this.LinksFontColor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.LinksFontColor.Location = new System.Drawing.Point(62, 47);
-            this.LinksFontColor.Name = "LinksFontColor";
-            this.LinksFontColor.ReadOnly = true;
-            this.LinksFontColor.Size = new System.Drawing.Size(47, 20);
-            this.LinksFontColor.TabIndex = 5;
+            this.buttonLinkColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonLinkColor.Location = new System.Drawing.Point(107, 99);
+            this.buttonLinkColor.Name = "buttonLinkColor";
+            this.buttonLinkColor.Size = new System.Drawing.Size(26, 21);
+            this.buttonLinkColor.TabIndex = 17;
+            this.buttonLinkColor.UseVisualStyleBackColor = true;
+            this.buttonLinkColor.Click += new System.EventHandler(this.buttonLinkColor_Click);
             // 
-            // LinksFontSize
+            // buttonTextColor
             // 
-            this.LinksFontSize.Location = new System.Drawing.Point(62, 21);
-            this.LinksFontSize.Name = "LinksFontSize";
-            this.LinksFontSize.Size = new System.Drawing.Size(47, 20);
-            this.LinksFontSize.TabIndex = 4;
-            // 
-            // LinksFontExample
-            // 
-            this.LinksFontExample.BackColor = System.Drawing.Color.White;
-            this.LinksFontExample.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.LinksFontExample.Location = new System.Drawing.Point(116, 21);
-            this.LinksFontExample.Name = "LinksFontExample";
-            this.LinksFontExample.ReadOnly = true;
-            this.LinksFontExample.Size = new System.Drawing.Size(116, 43);
-            this.LinksFontExample.TabIndex = 3;
-            this.LinksFontExample.Text = "";
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(7, 51);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(31, 13);
-            this.label25.TabIndex = 2;
-            this.label25.Text = "Color";
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(7, 25);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(49, 13);
-            this.label26.TabIndex = 1;
-            this.label26.Text = "Font size";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.AttributeFontColor);
-            this.groupBox2.Controls.Add(this.AttributeFontSize);
-            this.groupBox2.Controls.Add(this.AttributeFontExample);
-            this.groupBox2.Controls.Add(this.label21);
-            this.groupBox2.Controls.Add(this.label24);
-            this.groupBox2.Location = new System.Drawing.Point(7, 191);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(238, 78);
-            this.groupBox2.TabIndex = 8;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Attributes";
-            // 
-            // AttributeFontColor
-            // 
-            this.AttributeFontColor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.AttributeFontColor.Location = new System.Drawing.Point(62, 47);
-            this.AttributeFontColor.Name = "AttributeFontColor";
-            this.AttributeFontColor.ReadOnly = true;
-            this.AttributeFontColor.Size = new System.Drawing.Size(47, 20);
-            this.AttributeFontColor.TabIndex = 5;
-            // 
-            // AttributeFontSize
-            // 
-            this.AttributeFontSize.Location = new System.Drawing.Point(62, 21);
-            this.AttributeFontSize.Name = "AttributeFontSize";
-            this.AttributeFontSize.Size = new System.Drawing.Size(47, 20);
-            this.AttributeFontSize.TabIndex = 4;
-            // 
-            // AttributeFontExample
-            // 
-            this.AttributeFontExample.BackColor = System.Drawing.Color.White;
-            this.AttributeFontExample.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.AttributeFontExample.Location = new System.Drawing.Point(116, 21);
-            this.AttributeFontExample.Name = "AttributeFontExample";
-            this.AttributeFontExample.ReadOnly = true;
-            this.AttributeFontExample.Size = new System.Drawing.Size(116, 43);
-            this.AttributeFontExample.TabIndex = 3;
-            this.AttributeFontExample.Text = "";
+            this.buttonTextColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonTextColor.Location = new System.Drawing.Point(107, 36);
+            this.buttonTextColor.Name = "buttonTextColor";
+            this.buttonTextColor.Size = new System.Drawing.Size(26, 21);
+            this.buttonTextColor.TabIndex = 16;
+            this.buttonTextColor.UseVisualStyleBackColor = true;
+            this.buttonTextColor.Click += new System.EventHandler(this.buttonTextColor_Click);
             // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(7, 51);
+            this.label21.Location = new System.Drawing.Point(136, 19);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(31, 13);
-            this.label21.TabIndex = 2;
-            this.label21.Text = "Color";
+            this.label21.Size = new System.Drawing.Size(67, 13);
+            this.label21.TabIndex = 15;
+            this.label21.Text = "Example text";
             // 
-            // label24
+            // buttonAttributeColor
             // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(7, 25);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(49, 13);
-            this.label24.TabIndex = 1;
-            this.label24.Text = "Font size";
+            this.buttonAttributeColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonAttributeColor.Location = new System.Drawing.Point(107, 67);
+            this.buttonAttributeColor.Name = "buttonAttributeColor";
+            this.buttonAttributeColor.Size = new System.Drawing.Size(26, 21);
+            this.buttonAttributeColor.TabIndex = 11;
+            this.buttonAttributeColor.UseVisualStyleBackColor = true;
+            this.buttonAttributeColor.Click += new System.EventHandler(this.buttonAttributeColor_Click);
             // 
-            // groupBox1
+            // buttonLinkFont
             // 
-            this.groupBox1.Controls.Add(this.TextFontColor);
-            this.groupBox1.Controls.Add(this.TextFontSize);
-            this.groupBox1.Controls.Add(this.TextFontExample);
-            this.groupBox1.Controls.Add(this.label23);
-            this.groupBox1.Controls.Add(this.label22);
-            this.groupBox1.Location = new System.Drawing.Point(7, 107);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(238, 78);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Text";
+            this.buttonLinkFont.Location = new System.Drawing.Point(6, 99);
+            this.buttonLinkFont.Name = "buttonLinkFont";
+            this.buttonLinkFont.Size = new System.Drawing.Size(95, 23);
+            this.buttonLinkFont.TabIndex = 14;
+            this.buttonLinkFont.Text = "Link Font";
+            this.buttonLinkFont.UseVisualStyleBackColor = true;
+            this.buttonLinkFont.Click += new System.EventHandler(this.buttonLinkFont_Click);
             // 
-            // TextFontColor
+            // buttonAttributeFont
             // 
-            this.TextFontColor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.TextFontColor.Location = new System.Drawing.Point(62, 47);
-            this.TextFontColor.Name = "TextFontColor";
-            this.TextFontColor.ReadOnly = true;
-            this.TextFontColor.Size = new System.Drawing.Size(47, 20);
-            this.TextFontColor.TabIndex = 5;
+            this.buttonAttributeFont.Location = new System.Drawing.Point(6, 67);
+            this.buttonAttributeFont.Name = "buttonAttributeFont";
+            this.buttonAttributeFont.Size = new System.Drawing.Size(95, 23);
+            this.buttonAttributeFont.TabIndex = 13;
+            this.buttonAttributeFont.Text = "Attribute Font";
+            this.buttonAttributeFont.UseVisualStyleBackColor = true;
+            this.buttonAttributeFont.Click += new System.EventHandler(this.buttonAttributeFont_Click);
             // 
-            // TextFontSize
+            // buttonTextFont
             // 
-            this.TextFontSize.Location = new System.Drawing.Point(62, 21);
-            this.TextFontSize.Name = "TextFontSize";
-            this.TextFontSize.Size = new System.Drawing.Size(47, 20);
-            this.TextFontSize.TabIndex = 4;
+            this.buttonTextFont.Location = new System.Drawing.Point(6, 35);
+            this.buttonTextFont.Name = "buttonTextFont";
+            this.buttonTextFont.Size = new System.Drawing.Size(95, 23);
+            this.buttonTextFont.TabIndex = 12;
+            this.buttonTextFont.Text = "Text Font";
+            this.buttonTextFont.UseVisualStyleBackColor = true;
+            this.buttonTextFont.Click += new System.EventHandler(this.buttonTextFont_Click);
             // 
-            // TextFontExample
+            // RtfExample
             // 
-            this.TextFontExample.BackColor = System.Drawing.Color.White;
-            this.TextFontExample.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TextFontExample.Location = new System.Drawing.Point(116, 21);
-            this.TextFontExample.Name = "TextFontExample";
-            this.TextFontExample.ReadOnly = true;
-            this.TextFontExample.Size = new System.Drawing.Size(116, 43);
-            this.TextFontExample.TabIndex = 3;
-            this.TextFontExample.Text = "";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(7, 51);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(31, 13);
-            this.label23.TabIndex = 2;
-            this.label23.Text = "Color";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(7, 25);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(49, 13);
-            this.label22.TabIndex = 1;
-            this.label22.Text = "Font size";
+            this.RtfExample.BackColor = System.Drawing.Color.White;
+            this.RtfExample.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.RtfExample.Location = new System.Drawing.Point(139, 35);
+            this.RtfExample.Name = "RtfExample";
+            this.RtfExample.ReadOnly = true;
+            this.RtfExample.Size = new System.Drawing.Size(195, 87);
+            this.RtfExample.TabIndex = 11;
+            this.RtfExample.Text = "";
             // 
             // SpacesAfterParagraph
             // 
@@ -1040,24 +950,6 @@
             this.buttonReset.UseVisualStyleBackColor = true;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
-            // buttonCrawlerPatternAdd
-            // 
-            this.buttonCrawlerPatternAdd.Location = new System.Drawing.Point(112, 195);
-            this.buttonCrawlerPatternAdd.Name = "buttonCrawlerPatternAdd";
-            this.buttonCrawlerPatternAdd.Size = new System.Drawing.Size(40, 23);
-            this.buttonCrawlerPatternAdd.TabIndex = 14;
-            this.buttonCrawlerPatternAdd.Text = "\\/";
-            this.buttonCrawlerPatternAdd.UseVisualStyleBackColor = true;
-            // 
-            // buttonCrawlerPatternRemove
-            // 
-            this.buttonCrawlerPatternRemove.Location = new System.Drawing.Point(158, 195);
-            this.buttonCrawlerPatternRemove.Name = "buttonCrawlerPatternRemove";
-            this.buttonCrawlerPatternRemove.Size = new System.Drawing.Size(40, 23);
-            this.buttonCrawlerPatternRemove.TabIndex = 15;
-            this.buttonCrawlerPatternRemove.Text = "/\\";
-            this.buttonCrawlerPatternRemove.UseVisualStyleBackColor = true;
-            // 
             // SettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1090,15 +982,8 @@
             this.tabWordsCounterSettings.PerformLayout();
             this.tabRtfSettings.ResumeLayout(false);
             this.tabRtfSettings.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LinksFontSize)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.AttributeFontSize)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TextFontSize)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SpacesAfterParagraph)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RtfNumberOfPagesInReport)).EndInit();
             this.ResumeLayout(false);
@@ -1119,7 +1004,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonBrowseRootFolder;
         private System.Windows.Forms.TextBox ReportsRootFolder;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox ApplicationVersion;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox StatisticsFilename;
         private System.Windows.Forms.Label label3;
@@ -1166,7 +1051,6 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.ListBox crawlerPatterns;
         private System.Windows.Forms.TextBox crawlerNewPatternValue;
-        private System.Windows.Forms.ComboBox crawlerNewPatternType;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.NumericUpDown RtfNumberOfPagesInReport;
         private System.Windows.Forms.Label label19;
@@ -1174,25 +1058,16 @@
         private System.Windows.Forms.TextBox RtfBaseFilename;
         private System.Windows.Forms.NumericUpDown SpacesAfterParagraph;
         private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox TextFontColor;
-        private System.Windows.Forms.NumericUpDown TextFontSize;
-        private System.Windows.Forms.RichTextBox TextFontExample;
-        private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TextBox LinksFontColor;
-        private System.Windows.Forms.NumericUpDown LinksFontSize;
-        private System.Windows.Forms.RichTextBox LinksFontExample;
-        private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.TextBox AttributeFontColor;
-        private System.Windows.Forms.NumericUpDown AttributeFontSize;
-        private System.Windows.Forms.RichTextBox AttributeFontExample;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Button buttonCrawlerPatternRemove;
         private System.Windows.Forms.Button buttonCrawlerPatternAdd;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button buttonLinkColor;
+        private System.Windows.Forms.Button buttonTextColor;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Button buttonAttributeColor;
+        private System.Windows.Forms.Button buttonLinkFont;
+        private System.Windows.Forms.Button buttonAttributeFont;
+        private System.Windows.Forms.Button buttonTextFont;
+        private System.Windows.Forms.RichTextBox RtfExample;
     }
 }

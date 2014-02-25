@@ -17,6 +17,7 @@ using Abot.Crawler;
 using Abot.Poco;
 using Abot.Core;
 using System.Net;
+using ESCommon.Rtf;
 
 namespace SiteWordsExtractor
 {
@@ -41,22 +42,16 @@ namespace SiteWordsExtractor
 
         #endregion // Delegates
 
-        #region Constants
-
-        private const string REPROT_FOLDER_NAME = "Report\\";
-        private const string GLOBAL_RFT_FILENAME = "report.rtf";
-
-        #endregion // Constants
-
         #region Data Members
         
-        AppSettings m_appSettings;
         string m_statsRootFolder;
         string m_reportFolder;
         BackgroundWorker m_backgroundWorker;
-        List<string> m_notAllowedFileExtList;
+        List<string> m_stringsNotAllowedInUrl;
         HtmlProcessor m_htmlProcessor;
         ListViewColumnSorter m_columnSorter;
+        List<RtfDocument> m_allDocuments;
+        int m_globalWordsCounter;
         
         #endregion
         
@@ -83,9 +78,9 @@ namespace SiteWordsExtractor
             log.Info("Application started");
 
 
-            m_appSettings = AppSettingsStorage.Load();
+            AppSettings.Settings = AppSettingsStorage.Load();
+            //m_appSettings = AppSettingsStorage.Load();
             updateStatusLine("Configuration Loaded");
-            siteURL.Text = m_appSettings.defaultUrl;
             progressLabel.Text = "";
             m_statsRootFolder = null;
             m_reportFolder = null;
@@ -109,30 +104,11 @@ namespace SiteWordsExtractor
         private void settingsButton_Click(object sender, EventArgs e)
         {
             SettingsDialog dlg = new SettingsDialog();
-            dlg.Settings = m_appSettings;
+            dlg.Settings = AppSettings.Settings;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("OK");
-            }
-
-            return;
-            Settings settingsDlg = new Settings();
-            settingsDlg.SetAppSettings(m_appSettings);
-
-            DialogResult result = settingsDlg.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                m_appSettings = settingsDlg.GetAppSettings();
-                if (validateSettings())
-                {
-                    AppSettingsStorage.Save(m_appSettings);
-                    siteURL.Text = m_appSettings.defaultUrl;
-                    updateStatusLine("Configuration Saved");
-                }
-                else
-                {
-                    updateStatusLine("Failed to validate settings");
-                }
+                AppSettings.Settings = dlg.Settings;
+                updateStatusLine("Configuration Saved");
             }
         }
 
@@ -189,7 +165,7 @@ namespace SiteWordsExtractor
             siteURL.Text = url;
 
             // validate root dir
-            string rootDir = m_appSettings.reportsRootFolder;
+            string rootDir = AppSettings.Settings.Application.ReportsRootFolder;
             if (String.IsNullOrWhiteSpace(rootDir))
             {
                 // if not selected, select current folder for reports
@@ -199,11 +175,8 @@ namespace SiteWordsExtractor
             {
                 rootDir += "\\";
             }
-            m_appSettings.reportsRootFolder = rootDir;
 
-            m_notAllowedFileExtList = new List<string>(m_appSettings.fileExt.Split(','));
-
-            m_htmlProcessor.SetAttributes(m_appSettings.attributes);
+            m_stringsNotAllowedInUrl = new List<string>(AppSettings.Settings.Crawler.RegExDenyURLs.Split('|'));
 
             return true;
         }
@@ -226,6 +199,8 @@ namespace SiteWordsExtractor
                 return false;
             }
 
+            m_allDocuments = new List<RtfDocument>();
+
             m_backgroundWorker = new BackgroundWorker();
             m_backgroundWorker.DoWork += new DoWorkEventHandler(doWork);
 
@@ -240,6 +215,8 @@ namespace SiteWordsExtractor
             log.Info("Done working on site: " + siteURL.Text);
             log.Info(progressLabel.Text);
 
+            createGlobalRtfReport();
+
             // invalidate the reports folder
             m_statsRootFolder = null;
             m_reportFolder = null;
@@ -248,14 +225,11 @@ namespace SiteWordsExtractor
         private void doWork(object sender, DoWorkEventArgs e)
         {
             CrawlConfiguration crawlConfig = new CrawlConfiguration();
-            //crawlConfig.CrawlTimeoutSeconds = m_appSettings.httpTimeoutSec;
-            crawlConfig.MaxConcurrentThreads = 10;
-            //crawlConfig.MaxConcurrentThreads = 1;
-            crawlConfig.MaxPagesToCrawl = m_appSettings.maxPagesPerSite;
-            crawlConfig.UserAgentString = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36";
-            crawlConfig.HttpRequestMaxAutoRedirects = m_appSettings.maxRedirects;
-            crawlConfig.MaxCrawlDepth = m_appSettings.maxSiteDepth;
-            //crawlConfig.MinCrawlDelayPerDomainMilliSeconds = m_appSettings.minHTTPdelayMs;
+            crawlConfig.MaxConcurrentThreads = AppSettings.Settings.Crawler.MaxConcurrentThreads;
+            crawlConfig.MaxPagesToCrawl = AppSettings.Settings.Crawler.MaxPagesToCrawl;
+            crawlConfig.UserAgentString = AppSettings.Settings.Crawler.UserAgentString;
+            crawlConfig.HttpRequestMaxAutoRedirects = AppSettings.Settings.Crawler.HttpRequestMaxAutoRedirects;
+            crawlConfig.MaxCrawlDepth = AppSettings.Settings.Crawler.MaxCrawlDepth;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(crawlConfig, null, null, null, new SitePageRequester(crawlConfig), null, null, null, null);
             crawler.PageCrawlStartingAsync += crawler_PageCrawlStartingAsync;
@@ -264,12 +238,7 @@ namespace SiteWordsExtractor
             crawler.PageLinksCrawlDisallowedAsync += crawler_PageLinksCrawlDisallowedAsync;
             crawler.ShouldCrawlPage(crawler_ShouldCrawlPage);
 
-            string globalRtfFilepath = m_reportFolder + GLOBAL_RFT_FILENAME;
-            Html2Rtf globalRtf = new Html2Rtf(globalRtfFilepath, m_appSettings.wordRegex);
-            globalRtf.RegisterProcessor(m_htmlProcessor);
-
-
-            // TODO: create global words counter
+            m_globalWordsCounter = 0;
 
             updateCrawlingStarted();
 
@@ -283,15 +252,11 @@ namespace SiteWordsExtractor
             }
 
             string elapsedTimeStr = crawlerResult.Elapsed.ToString(@"dd\.hh\:mm\:ss");
-            int globalWordsCount = globalRtf.WordsCount;
             log.Debug("*** Crawling completed. Elapsed time: " + elapsedTimeStr);
-            log.Debug("*** Total words found in this site: " + globalWordsCount.ToString());
-
-            // close global rtf file of site
-            globalRtf.UnregisterProcessor();
+            log.Debug("*** Total words found in this site: " + m_globalWordsCounter.ToString());
 
             // create CSV report
-            createCSVFile(globalWordsCount);
+            createCSVFile(m_globalWordsCounter);
 
             updateCrawlingFinished();
             done();
@@ -306,7 +271,7 @@ namespace SiteWordsExtractor
 
 			int wordsCount = 0;
 
-			Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, m_appSettings.wordRegex);
+            Html2Rtf rtfFile = new Html2Rtf(rtfFilepath, AppSettings.Settings.WordsCounter.RegEx);
 
 			rtfFile.RegisterProcessor(m_htmlProcessor);
 			try
@@ -321,9 +286,54 @@ namespace SiteWordsExtractor
 			wordsCount = rtfFile.WordsCount;
 			rtfFile.UnregisterProcessor();
 
+            m_allDocuments.Add(rtfFile.RtfDoc);
+            m_globalWordsCounter += wordsCount;
+
 			updateListView(url, wordsCount, rtfFilename);
 		}
 
+        private void createGlobalRtfReport()
+        {
+            int maxPagesInReport = AppSettings.Settings.Rtf.RtfNumberOfPagesInReport;
+            RtfDocument globalDoc = null;
+            string globalDocFilename = "";
+            for (int idx = 0; idx < m_allDocuments.Count; idx++)
+            {
+                if ((idx % maxPagesInReport) == 0)
+                {
+                    // close the current document
+                    if (globalDoc != null)
+                    {
+                        globalDocFilename = m_reportFolder + String.Format("{0}{1}-{2}.rtf", AppSettings.Settings.Rtf.RtfReportBaseFilename, idx - maxPagesInReport, idx - 1);
+                        RtfWriter rtfWriter = new RtfWriter();
+                        TextWriter writer = new StreamWriter(globalDocFilename);
+                        rtfWriter.Write(writer, globalDoc);
+                        writer.Close();
+                    }
+
+                    // start new document
+                    globalDoc = new RtfDocument();
+                }
+
+                RtfDocument currDoc = m_allDocuments[idx];
+                foreach (RtfDocumentContentBase item in currDoc.Contents)
+                {
+                    globalDoc.Contents.Add(item);
+                }
+            }
+
+            // close the last file
+            if (globalDoc != null)
+            {
+                int lastCount = (m_allDocuments.Count / maxPagesInReport) * maxPagesInReport;
+                globalDocFilename = m_reportFolder + String.Format("{0}{1}-{2}.rtf", AppSettings.Settings.Rtf.RtfReportBaseFilename, lastCount, m_allDocuments.Count);
+                RtfWriter rtfWriter = new RtfWriter();
+                TextWriter writer = new StreamWriter(globalDocFilename);
+                rtfWriter.Write(writer, globalDoc);
+                writer.Close();
+            }
+        }
+        
         private void createCSVFile(int totalWordsCount)
         {
             if (InvokeRequired)
@@ -332,7 +342,7 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            string csvFilepath = m_reportFolder + m_appSettings.statFilename;
+            string csvFilepath = m_reportFolder + AppSettings.Settings.Application.StatisticsFilename;
             StreamWriter csvFile;
             try
             {
@@ -441,20 +451,11 @@ namespace SiteWordsExtractor
 
         CrawlDecision crawler_ShouldCrawlPage(PageToCrawl pageToCrawl, CrawlContext crawlContext)
         {
-            CrawlDecision decision = new CrawlDecision();
-            FileInfo fi;
-            string ext = "";
-            string decodedUrl = "";
             try
             {
                 log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
-                decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
-                if (Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
-                {
-                    fi = new FileInfo(decodedUrl);
-                    ext = fi.Extension;
-                }
-                else
+                string decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
+                if (!Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
                 {
                     return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
                 }
@@ -462,21 +463,20 @@ namespace SiteWordsExtractor
             catch (Exception excep)
             {
                 log.Error("failed to get absolute path of url: " + excep.ToString());
+                return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
             }
-            if (!String.IsNullOrEmpty(ext))
+
+            string plainUrl = pageToCrawl.Uri.AbsolutePath.ToLower();
+            foreach (string pattern in m_stringsNotAllowedInUrl)
             {
-                foreach (string notAllowedExt in m_notAllowedFileExtList)
+                if (plainUrl.Contains(pattern))
                 {
-                    if (ext == notAllowedExt)
-                    {
-                        return new CrawlDecision { Allow = false, Reason = "File extension is not allowed: " + ext };
-                    }
+                    return new CrawlDecision { Allow = false, Reason = "Url contains not allowed string: " + pattern };
                 }
             }
+            
 
-            decision = new CrawlDecision { Allow = true };
-
-            return decision;
+            return new CrawlDecision { Allow = true };
         }
 
         #endregion // Crawler Callbacks
@@ -520,7 +520,7 @@ namespace SiteWordsExtractor
                 return;
             }
 
-            m_statsRootFolder = m_appSettings.reportsRootFolder;
+            m_statsRootFolder = AppSettings.Settings.Application.ReportsRootFolder;
             if (String.IsNullOrWhiteSpace(m_statsRootFolder))
             {
                 m_statsRootFolder = ".\\";
@@ -542,7 +542,7 @@ namespace SiteWordsExtractor
             }
             else
             {
-                m_reportFolder = m_statsRootFolder + REPROT_FOLDER_NAME;
+                m_reportFolder = m_statsRootFolder + AppSettings.Settings.Application.ReportsFolderName + "\\";
             }
         }
 
@@ -600,7 +600,7 @@ namespace SiteWordsExtractor
 
 
             // filename should be {%04d}_{%-20s}.rtf where d is "links visited" and s is the (up to) 20 first chars of the filename
-            string filename = String.Format("{0:0000}{1}{2}", counter, urlPart, ext);
+            string filename = String.Format("{0:0000} {1}{2}", counter, urlPart, ext);
 
             return filename;
         }

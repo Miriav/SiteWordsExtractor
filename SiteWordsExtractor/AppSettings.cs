@@ -13,7 +13,7 @@ namespace SiteWordsExtractor
     {
         public class ApplicationSettings
         {
-            public readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
+            public string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             public string ReportsRootFolder = "";
             public string StatisticsFilename = "statistics.csv";
             public string ReportsFolderName = "Report";
@@ -37,7 +37,7 @@ namespace SiteWordsExtractor
             public int HttpRequestMaxAutoRedirects = 7;
             public int MaxCrawlDepth = 10;
 
-            public string RegExDenyURLs = @"\.jpg|\.zip|\.pdf";
+            public string RegExDenyURLs = @".jpg|.zip|.pdf|.exe|.doc|.flv|.swf";
         }
 
         public class WordsCounterSettings
@@ -47,22 +47,37 @@ namespace SiteWordsExtractor
 
         public class RtfSettings
         {
-            public string RtfReportFilename = "report.rtf";
+            public class FontSettings
+            {
+                public string Name;
+                public FontStyle Style;
+                public float Size;
+                public string Color;
+
+                public FontSettings()
+                {
+                    Name = "Calibri";
+                    Style = FontStyle.Regular;
+                    Size = 12;
+                    Color = ColorTranslator.ToHtml(System.Drawing.Color.Black);
+                }
+
+                public FontSettings(string name, FontStyle style, int size, string color)
+                {
+                    Name = name;
+                    Style = style;
+                    Size = size;
+                    Color = color;
+                }
+            }
+
             public string RtfReportBaseFilename = "report_";
             public int RtfNumberOfPagesInReport = 100;
             public int SpaceAfterParagraph = 6;
 
-            public string TextFontName = "Calibri";
-            public int TextFontSize = 12;
-            public string TextFontColor = ColorTranslator.ToHtml(Color.Black);
-
-            public string AttributeFontName = "Calibri";
-            public int AttributeFontSize = 12;
-            public string AttributeFontColor = ColorTranslator.ToHtml(Color.Gray);
-
-            public string HyperlinkFontName = "Calibri";
-            public int HyperlinkFontSize = 12;
-            public string HyperlinkFontColor = ColorTranslator.ToHtml(Color.Blue);
+            public FontSettings TextFont = new FontSettings("Calibri", FontStyle.Regular, 12, ColorTranslator.ToHtml(Color.Black));
+            public FontSettings AttributeFont = new FontSettings("Calibri", FontStyle.Regular, 12, ColorTranslator.ToHtml(Color.Gray));
+            public FontSettings HyperlinkFont = new FontSettings("Calibri", FontStyle.Regular, 12, ColorTranslator.ToHtml(Color.Blue));
         }
 
         public ApplicationSettings Application = new ApplicationSettings();
@@ -70,55 +85,17 @@ namespace SiteWordsExtractor
         public CrawlerSettings Crawler = new CrawlerSettings();
         public WordsCounterSettings WordsCounter = new WordsCounterSettings();
         public RtfSettings Rtf = new RtfSettings();
-        
+
+
+        // global singleton application settings accessible from all modules
+        public static AppSettings Settings = new AppSettings();
 
         #region Application Settings
 
-        // applicatoin version
-        public string version = "1.0";
-
-        // default url
-        public string defaultUrl = "";
-
-        // Root folder for site reports
-        public string reportsRootFolder = "";
-
-        // Default file name for statistics CSV report
-        public string statFilename = "statistics.csv";
-
-        // List of Scrapped HTML tags (default is <script>, <style>, <comment>).
-        public string scrappedHTMLTags = "script,style,#comment";
-
-        // List of HTML tags to extract (default is ALT, TITLE).
-        public string attributes = "alt,title";
-
         // List of not allowed file extensions
+        // TODO: remove list
         public string fileExt = ".jpg,.png,.gif,.zip,.pdf";
-
-        // regular expression to be used when counting words in a page
-        public string wordRegex = @"[^\s\.\$\^\{\[\(\|\)\*\+\?\\!@#%&_=;:'""`~<>\-\/]+";
-
-        #endregion
-
-        #region Crawler Settings
-
-        // maximum number of pages to crawl in each site
-        public int maxPagesPerSite = 9999;
-
-        // HTTP timeout, default is 15 seconds
-        public int httpTimeoutSec = 15;
-
-        // Maximum number of allowed redirects
-        public int maxRedirects = 7;
-
-        // Maximum depth to crawl in site (default is 100 folders).
-        public int maxSiteDepth = 100;
-
-        // Minimum delay per HTTP request (default is 1000 miliseconds).
-        public int minHTTPdelayMs = 1000;
-
-
-
+        
         #endregion
 
     }

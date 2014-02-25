@@ -233,12 +233,12 @@ namespace SiteWordsExtractor
             m_tag2Type = new Dictionary<string, NodeType>();
 
             // set defaults
-            SetAttributes("value,alt,title");
-            SetTags(NodeType.Paragraph, "p,br,dl,div,h1,h2,h3,h4,h5,h6,li,ul,ol,table,tr,td,th,tbody,thead");
-            SetTags(NodeType.BoldText, "b,em,strong");
-            SetTags(NodeType.Hyperlink, "a");
-            SetTags(NodeType.Input, "input,textarea");
-            SetTags(NodeType.Ignored, "script,style,#comment");
+            SetAttributes(AppSettings.Settings.Html.Attributes);
+            SetTags(NodeType.Paragraph, AppSettings.Settings.Html.ParagraphTags);
+            SetTags(NodeType.BoldText, AppSettings.Settings.Html.BoldTextTags);
+            SetTags(NodeType.Hyperlink, AppSettings.Settings.Html.HyperlinkTags);
+            SetTags(NodeType.Input, AppSettings.Settings.Html.InputTags);
+            SetTags(NodeType.Ignored, AppSettings.Settings.Html.IgnoredTags);
         }
 
         public void ProcessHtmlPage(string url, HtmlDocument doc)
