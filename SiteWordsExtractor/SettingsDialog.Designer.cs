@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabApplicationSettings = new System.Windows.Forms.TabPage();
@@ -106,6 +107,7 @@
             this.buttonSaveAndExit = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
+            this.iconsList = new System.Windows.Forms.ImageList(this.components);
             this.tabControl.SuspendLayout();
             this.tabApplicationSettings.SuspendLayout();
             this.tabHtmlSettings.SuspendLayout();
@@ -131,10 +133,11 @@
             this.tabControl.Controls.Add(this.tabCrawlerSettings);
             this.tabControl.Controls.Add(this.tabWordsCounterSettings);
             this.tabControl.Controls.Add(this.tabRtfSettings);
+            this.tabControl.ImageList = this.iconsList;
             this.tabControl.Location = new System.Drawing.Point(12, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(360, 425);
+            this.tabControl.Size = new System.Drawing.Size(410, 425);
             this.tabControl.TabIndex = 0;
             // 
             // tabApplicationSettings
@@ -148,10 +151,11 @@
             this.tabApplicationSettings.Controls.Add(this.buttonBrowseRootFolder);
             this.tabApplicationSettings.Controls.Add(this.ReportsRootFolder);
             this.tabApplicationSettings.Controls.Add(this.label1);
-            this.tabApplicationSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabApplicationSettings.ImageIndex = 0;
+            this.tabApplicationSettings.Location = new System.Drawing.Point(4, 23);
             this.tabApplicationSettings.Name = "tabApplicationSettings";
             this.tabApplicationSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabApplicationSettings.Size = new System.Drawing.Size(352, 399);
+            this.tabApplicationSettings.Size = new System.Drawing.Size(402, 398);
             this.tabApplicationSettings.TabIndex = 0;
             this.tabApplicationSettings.Text = "Application";
             // 
@@ -159,7 +163,7 @@
             // 
             this.ReportsFolderName.Location = new System.Drawing.Point(119, 75);
             this.ReportsFolderName.Name = "ReportsFolderName";
-            this.ReportsFolderName.Size = new System.Drawing.Size(196, 20);
+            this.ReportsFolderName.Size = new System.Drawing.Size(246, 20);
             this.ReportsFolderName.TabIndex = 7;
             // 
             // label3
@@ -175,7 +179,7 @@
             // 
             this.StatisticsFilename.Location = new System.Drawing.Point(119, 51);
             this.StatisticsFilename.Name = "StatisticsFilename";
-            this.StatisticsFilename.Size = new System.Drawing.Size(196, 20);
+            this.StatisticsFilename.Size = new System.Drawing.Size(246, 20);
             this.StatisticsFilename.TabIndex = 5;
             // 
             // ApplicationVersion
@@ -186,7 +190,7 @@
             this.ApplicationVersion.Location = new System.Drawing.Point(9, 7);
             this.ApplicationVersion.Name = "ApplicationVersion";
             this.ApplicationVersion.ReadOnly = true;
-            this.ApplicationVersion.Size = new System.Drawing.Size(337, 13);
+            this.ApplicationVersion.Size = new System.Drawing.Size(387, 13);
             this.ApplicationVersion.TabIndex = 4;
             this.ApplicationVersion.Text = "Application Version: 0.9.4.0";
             // 
@@ -201,7 +205,7 @@
             // 
             // buttonBrowseRootFolder
             // 
-            this.buttonBrowseRootFolder.Location = new System.Drawing.Point(321, 26);
+            this.buttonBrowseRootFolder.Location = new System.Drawing.Point(371, 26);
             this.buttonBrowseRootFolder.Name = "buttonBrowseRootFolder";
             this.buttonBrowseRootFolder.Size = new System.Drawing.Size(25, 23);
             this.buttonBrowseRootFolder.TabIndex = 2;
@@ -213,7 +217,7 @@
             // 
             this.ReportsRootFolder.Location = new System.Drawing.Point(119, 27);
             this.ReportsRootFolder.Name = "ReportsRootFolder";
-            this.ReportsRootFolder.Size = new System.Drawing.Size(196, 20);
+            this.ReportsRootFolder.Size = new System.Drawing.Size(246, 20);
             this.ReportsRootFolder.TabIndex = 1;
             // 
             // label1
@@ -255,16 +259,17 @@
             this.tabHtmlSettings.Controls.Add(this.listBoxParagraphTags);
             this.tabHtmlSettings.Controls.Add(this.label4);
             this.tabHtmlSettings.Controls.Add(this.listBoxHtmlTags);
-            this.tabHtmlSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabHtmlSettings.ImageIndex = 1;
+            this.tabHtmlSettings.Location = new System.Drawing.Point(4, 23);
             this.tabHtmlSettings.Name = "tabHtmlSettings";
             this.tabHtmlSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabHtmlSettings.Size = new System.Drawing.Size(352, 399);
+            this.tabHtmlSettings.Size = new System.Drawing.Size(402, 398);
             this.tabHtmlSettings.TabIndex = 1;
             this.tabHtmlSettings.Text = "HTML";
             // 
             // buttonAttributeRemove
             // 
-            this.buttonAttributeRemove.Location = new System.Drawing.Point(303, 47);
+            this.buttonAttributeRemove.Location = new System.Drawing.Point(351, 47);
             this.buttonAttributeRemove.Name = "buttonAttributeRemove";
             this.buttonAttributeRemove.Size = new System.Drawing.Size(43, 23);
             this.buttonAttributeRemove.TabIndex = 26;
@@ -274,7 +279,7 @@
             // 
             // buttonAttributeAdd
             // 
-            this.buttonAttributeAdd.Location = new System.Drawing.Point(255, 47);
+            this.buttonAttributeAdd.Location = new System.Drawing.Point(300, 47);
             this.buttonAttributeAdd.Name = "buttonAttributeAdd";
             this.buttonAttributeAdd.Size = new System.Drawing.Size(43, 23);
             this.buttonAttributeAdd.TabIndex = 25;
@@ -284,7 +289,7 @@
             // 
             // NewAttribute
             // 
-            this.NewAttribute.Location = new System.Drawing.Point(255, 21);
+            this.NewAttribute.Location = new System.Drawing.Point(300, 21);
             this.NewAttribute.Name = "NewAttribute";
             this.NewAttribute.Size = new System.Drawing.Size(94, 20);
             this.NewAttribute.TabIndex = 24;
@@ -292,7 +297,7 @@
             // listBoxAttributes
             // 
             this.listBoxAttributes.FormattingEnabled = true;
-            this.listBoxAttributes.Location = new System.Drawing.Point(255, 76);
+            this.listBoxAttributes.Location = new System.Drawing.Point(300, 76);
             this.listBoxAttributes.Name = "listBoxAttributes";
             this.listBoxAttributes.Size = new System.Drawing.Size(94, 69);
             this.listBoxAttributes.TabIndex = 23;
@@ -300,7 +305,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(276, 5);
+            this.label10.Location = new System.Drawing.Point(300, 5);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(51, 13);
             this.label10.TabIndex = 22;
@@ -309,7 +314,7 @@
             // buttonIgnoreRemove
             // 
             this.buttonIgnoreRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonIgnoreRemove.Location = new System.Drawing.Point(107, 358);
+            this.buttonIgnoreRemove.Location = new System.Drawing.Point(123, 358);
             this.buttonIgnoreRemove.Name = "buttonIgnoreRemove";
             this.buttonIgnoreRemove.Size = new System.Drawing.Size(28, 23);
             this.buttonIgnoreRemove.TabIndex = 21;
@@ -320,7 +325,7 @@
             // buttonIgnoreAdd
             // 
             this.buttonIgnoreAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonIgnoreAdd.Location = new System.Drawing.Point(107, 334);
+            this.buttonIgnoreAdd.Location = new System.Drawing.Point(123, 334);
             this.buttonIgnoreAdd.Name = "buttonIgnoreAdd";
             this.buttonIgnoreAdd.Size = new System.Drawing.Size(28, 23);
             this.buttonIgnoreAdd.TabIndex = 20;
@@ -331,7 +336,7 @@
             // buttonHyperlinkRemove
             // 
             this.buttonHyperlinkRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonHyperlinkRemove.Location = new System.Drawing.Point(107, 283);
+            this.buttonHyperlinkRemove.Location = new System.Drawing.Point(123, 283);
             this.buttonHyperlinkRemove.Name = "buttonHyperlinkRemove";
             this.buttonHyperlinkRemove.Size = new System.Drawing.Size(28, 23);
             this.buttonHyperlinkRemove.TabIndex = 19;
@@ -342,7 +347,7 @@
             // buttonHyperlinkAdd
             // 
             this.buttonHyperlinkAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonHyperlinkAdd.Location = new System.Drawing.Point(107, 259);
+            this.buttonHyperlinkAdd.Location = new System.Drawing.Point(123, 259);
             this.buttonHyperlinkAdd.Name = "buttonHyperlinkAdd";
             this.buttonHyperlinkAdd.Size = new System.Drawing.Size(28, 23);
             this.buttonHyperlinkAdd.TabIndex = 18;
@@ -353,7 +358,7 @@
             // buttonInputRemove
             // 
             this.buttonInputRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonInputRemove.Location = new System.Drawing.Point(107, 208);
+            this.buttonInputRemove.Location = new System.Drawing.Point(123, 208);
             this.buttonInputRemove.Name = "buttonInputRemove";
             this.buttonInputRemove.Size = new System.Drawing.Size(28, 23);
             this.buttonInputRemove.TabIndex = 17;
@@ -364,7 +369,7 @@
             // buttonInputAdd
             // 
             this.buttonInputAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonInputAdd.Location = new System.Drawing.Point(107, 184);
+            this.buttonInputAdd.Location = new System.Drawing.Point(123, 184);
             this.buttonInputAdd.Name = "buttonInputAdd";
             this.buttonInputAdd.Size = new System.Drawing.Size(28, 23);
             this.buttonInputAdd.TabIndex = 16;
@@ -375,7 +380,7 @@
             // buttonBoldRemove
             // 
             this.buttonBoldRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBoldRemove.Location = new System.Drawing.Point(107, 133);
+            this.buttonBoldRemove.Location = new System.Drawing.Point(123, 133);
             this.buttonBoldRemove.Name = "buttonBoldRemove";
             this.buttonBoldRemove.Size = new System.Drawing.Size(28, 23);
             this.buttonBoldRemove.TabIndex = 15;
@@ -386,7 +391,7 @@
             // buttonBoldAdd
             // 
             this.buttonBoldAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBoldAdd.Location = new System.Drawing.Point(107, 109);
+            this.buttonBoldAdd.Location = new System.Drawing.Point(123, 109);
             this.buttonBoldAdd.Name = "buttonBoldAdd";
             this.buttonBoldAdd.Size = new System.Drawing.Size(28, 23);
             this.buttonBoldAdd.TabIndex = 14;
@@ -397,39 +402,39 @@
             // listBoxIgnoreTags
             // 
             this.listBoxIgnoreTags.FormattingEnabled = true;
-            this.listBoxIgnoreTags.Location = new System.Drawing.Point(141, 334);
+            this.listBoxIgnoreTags.Location = new System.Drawing.Point(157, 334);
             this.listBoxIgnoreTags.Name = "listBoxIgnoreTags";
-            this.listBoxIgnoreTags.Size = new System.Drawing.Size(94, 56);
+            this.listBoxIgnoreTags.Size = new System.Drawing.Size(112, 56);
             this.listBoxIgnoreTags.TabIndex = 13;
             // 
             // listBoxHyperlinkTags
             // 
             this.listBoxHyperlinkTags.FormattingEnabled = true;
-            this.listBoxHyperlinkTags.Location = new System.Drawing.Point(141, 259);
+            this.listBoxHyperlinkTags.Location = new System.Drawing.Point(157, 259);
             this.listBoxHyperlinkTags.Name = "listBoxHyperlinkTags";
-            this.listBoxHyperlinkTags.Size = new System.Drawing.Size(94, 56);
+            this.listBoxHyperlinkTags.Size = new System.Drawing.Size(112, 56);
             this.listBoxHyperlinkTags.TabIndex = 12;
             // 
             // listBoxInputTags
             // 
             this.listBoxInputTags.FormattingEnabled = true;
-            this.listBoxInputTags.Location = new System.Drawing.Point(141, 184);
+            this.listBoxInputTags.Location = new System.Drawing.Point(157, 184);
             this.listBoxInputTags.Name = "listBoxInputTags";
-            this.listBoxInputTags.Size = new System.Drawing.Size(94, 56);
+            this.listBoxInputTags.Size = new System.Drawing.Size(112, 56);
             this.listBoxInputTags.TabIndex = 11;
             // 
             // listBoxBoldTextTags
             // 
             this.listBoxBoldTextTags.FormattingEnabled = true;
-            this.listBoxBoldTextTags.Location = new System.Drawing.Point(141, 109);
+            this.listBoxBoldTextTags.Location = new System.Drawing.Point(157, 109);
             this.listBoxBoldTextTags.Name = "listBoxBoldTextTags";
-            this.listBoxBoldTextTags.Size = new System.Drawing.Size(94, 56);
+            this.listBoxBoldTextTags.Size = new System.Drawing.Size(112, 56);
             this.listBoxBoldTextTags.TabIndex = 10;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(141, 318);
+            this.label9.Location = new System.Drawing.Point(157, 318);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(64, 13);
             this.label9.TabIndex = 9;
@@ -438,7 +443,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(141, 243);
+            this.label8.Location = new System.Drawing.Point(157, 243);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(78, 13);
             this.label8.TabIndex = 8;
@@ -447,7 +452,7 @@
             // buttonParagraphRemove
             // 
             this.buttonParagraphRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonParagraphRemove.Location = new System.Drawing.Point(107, 55);
+            this.buttonParagraphRemove.Location = new System.Drawing.Point(123, 56);
             this.buttonParagraphRemove.Name = "buttonParagraphRemove";
             this.buttonParagraphRemove.Size = new System.Drawing.Size(28, 23);
             this.buttonParagraphRemove.TabIndex = 7;
@@ -458,7 +463,7 @@
             // buttonParagraphAdd
             // 
             this.buttonParagraphAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonParagraphAdd.Location = new System.Drawing.Point(107, 31);
+            this.buttonParagraphAdd.Location = new System.Drawing.Point(123, 32);
             this.buttonParagraphAdd.Name = "buttonParagraphAdd";
             this.buttonParagraphAdd.Size = new System.Drawing.Size(28, 23);
             this.buttonParagraphAdd.TabIndex = 6;
@@ -469,7 +474,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(141, 168);
+            this.label7.Location = new System.Drawing.Point(157, 168);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(54, 13);
             this.label7.TabIndex = 5;
@@ -478,7 +483,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(141, 93);
+            this.label6.Location = new System.Drawing.Point(157, 93);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(75, 13);
             this.label6.TabIndex = 4;
@@ -487,7 +492,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(141, 5);
+            this.label5.Location = new System.Drawing.Point(157, 5);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(83, 13);
             this.label5.TabIndex = 3;
@@ -496,9 +501,9 @@
             // listBoxParagraphTags
             // 
             this.listBoxParagraphTags.FormattingEnabled = true;
-            this.listBoxParagraphTags.Location = new System.Drawing.Point(141, 21);
+            this.listBoxParagraphTags.Location = new System.Drawing.Point(157, 21);
             this.listBoxParagraphTags.Name = "listBoxParagraphTags";
-            this.listBoxParagraphTags.Size = new System.Drawing.Size(94, 69);
+            this.listBoxParagraphTags.Size = new System.Drawing.Size(112, 69);
             this.listBoxParagraphTags.TabIndex = 2;
             // 
             // label4
@@ -517,7 +522,7 @@
             this.listBoxHtmlTags.FormattingEnabled = true;
             this.listBoxHtmlTags.Location = new System.Drawing.Point(7, 21);
             this.listBoxHtmlTags.Name = "listBoxHtmlTags";
-            this.listBoxHtmlTags.Size = new System.Drawing.Size(94, 368);
+            this.listBoxHtmlTags.Size = new System.Drawing.Size(110, 368);
             this.listBoxHtmlTags.TabIndex = 0;
             // 
             // tabCrawlerSettings
@@ -538,16 +543,17 @@
             this.tabCrawlerSettings.Controls.Add(this.label13);
             this.tabCrawlerSettings.Controls.Add(this.label12);
             this.tabCrawlerSettings.Controls.Add(this.label11);
-            this.tabCrawlerSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabCrawlerSettings.ImageIndex = 2;
+            this.tabCrawlerSettings.Location = new System.Drawing.Point(4, 23);
             this.tabCrawlerSettings.Name = "tabCrawlerSettings";
             this.tabCrawlerSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCrawlerSettings.Size = new System.Drawing.Size(352, 399);
+            this.tabCrawlerSettings.Size = new System.Drawing.Size(402, 398);
             this.tabCrawlerSettings.TabIndex = 2;
             this.tabCrawlerSettings.Text = "Crawler";
             // 
             // buttonCrawlerPatternRemove
             // 
-            this.buttonCrawlerPatternRemove.Location = new System.Drawing.Point(158, 195);
+            this.buttonCrawlerPatternRemove.Location = new System.Drawing.Point(205, 195);
             this.buttonCrawlerPatternRemove.Name = "buttonCrawlerPatternRemove";
             this.buttonCrawlerPatternRemove.Size = new System.Drawing.Size(40, 23);
             this.buttonCrawlerPatternRemove.TabIndex = 15;
@@ -557,7 +563,7 @@
             // 
             // buttonCrawlerPatternAdd
             // 
-            this.buttonCrawlerPatternAdd.Location = new System.Drawing.Point(112, 195);
+            this.buttonCrawlerPatternAdd.Location = new System.Drawing.Point(159, 195);
             this.buttonCrawlerPatternAdd.Name = "buttonCrawlerPatternAdd";
             this.buttonCrawlerPatternAdd.Size = new System.Drawing.Size(40, 23);
             this.buttonCrawlerPatternAdd.TabIndex = 14;
@@ -570,14 +576,14 @@
             this.crawlerPatterns.FormattingEnabled = true;
             this.crawlerPatterns.Location = new System.Drawing.Point(10, 224);
             this.crawlerPatterns.Name = "crawlerPatterns";
-            this.crawlerPatterns.Size = new System.Drawing.Size(336, 160);
+            this.crawlerPatterns.Size = new System.Drawing.Size(386, 160);
             this.crawlerPatterns.TabIndex = 12;
             // 
             // crawlerNewPatternValue
             // 
             this.crawlerNewPatternValue.Location = new System.Drawing.Point(10, 172);
             this.crawlerNewPatternValue.Name = "crawlerNewPatternValue";
-            this.crawlerNewPatternValue.Size = new System.Drawing.Size(336, 20);
+            this.crawlerNewPatternValue.Size = new System.Drawing.Size(386, 20);
             this.crawlerNewPatternValue.TabIndex = 11;
             // 
             // label17
@@ -593,7 +599,7 @@
             // 
             this.UserAgentString.Location = new System.Drawing.Point(149, 112);
             this.UserAgentString.Name = "UserAgentString";
-            this.UserAgentString.Size = new System.Drawing.Size(197, 20);
+            this.UserAgentString.Size = new System.Drawing.Size(247, 20);
             this.UserAgentString.TabIndex = 9;
             // 
             // MaxSiteDepth
@@ -719,10 +725,11 @@
             this.tabWordsCounterSettings.BackColor = System.Drawing.SystemColors.Control;
             this.tabWordsCounterSettings.Controls.Add(this.WordsCounterRegex);
             this.tabWordsCounterSettings.Controls.Add(this.label16);
-            this.tabWordsCounterSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabWordsCounterSettings.ImageIndex = 4;
+            this.tabWordsCounterSettings.Location = new System.Drawing.Point(4, 23);
             this.tabWordsCounterSettings.Name = "tabWordsCounterSettings";
             this.tabWordsCounterSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabWordsCounterSettings.Size = new System.Drawing.Size(352, 399);
+            this.tabWordsCounterSettings.Size = new System.Drawing.Size(402, 398);
             this.tabWordsCounterSettings.TabIndex = 3;
             this.tabWordsCounterSettings.Text = "Words Counter";
             // 
@@ -730,7 +737,7 @@
             // 
             this.WordsCounterRegex.Location = new System.Drawing.Point(7, 24);
             this.WordsCounterRegex.Name = "WordsCounterRegex";
-            this.WordsCounterRegex.Size = new System.Drawing.Size(339, 20);
+            this.WordsCounterRegex.Size = new System.Drawing.Size(389, 20);
             this.WordsCounterRegex.TabIndex = 1;
             // 
             // label16
@@ -753,10 +760,11 @@
             this.tabRtfSettings.Controls.Add(this.RtfPagesExample);
             this.tabRtfSettings.Controls.Add(this.RtfBaseFilename);
             this.tabRtfSettings.Controls.Add(this.label18);
-            this.tabRtfSettings.Location = new System.Drawing.Point(4, 22);
+            this.tabRtfSettings.ImageIndex = 3;
+            this.tabRtfSettings.Location = new System.Drawing.Point(4, 23);
             this.tabRtfSettings.Name = "tabRtfSettings";
             this.tabRtfSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRtfSettings.Size = new System.Drawing.Size(352, 399);
+            this.tabRtfSettings.Size = new System.Drawing.Size(402, 398);
             this.tabRtfSettings.TabIndex = 4;
             this.tabRtfSettings.Text = "RTF";
             // 
@@ -772,7 +780,7 @@
             this.groupBox4.Controls.Add(this.RtfExample);
             this.groupBox4.Location = new System.Drawing.Point(6, 117);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(340, 128);
+            this.groupBox4.Size = new System.Drawing.Size(390, 152);
             this.groupBox4.TabIndex = 10;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Fonts";
@@ -780,7 +788,7 @@
             // buttonLinkColor
             // 
             this.buttonLinkColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonLinkColor.Location = new System.Drawing.Point(107, 99);
+            this.buttonLinkColor.Location = new System.Drawing.Point(107, 124);
             this.buttonLinkColor.Name = "buttonLinkColor";
             this.buttonLinkColor.Size = new System.Drawing.Size(26, 21);
             this.buttonLinkColor.TabIndex = 17;
@@ -809,7 +817,7 @@
             // buttonAttributeColor
             // 
             this.buttonAttributeColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonAttributeColor.Location = new System.Drawing.Point(107, 67);
+            this.buttonAttributeColor.Location = new System.Drawing.Point(107, 80);
             this.buttonAttributeColor.Name = "buttonAttributeColor";
             this.buttonAttributeColor.Size = new System.Drawing.Size(26, 21);
             this.buttonAttributeColor.TabIndex = 11;
@@ -818,7 +826,7 @@
             // 
             // buttonLinkFont
             // 
-            this.buttonLinkFont.Location = new System.Drawing.Point(6, 99);
+            this.buttonLinkFont.Location = new System.Drawing.Point(6, 123);
             this.buttonLinkFont.Name = "buttonLinkFont";
             this.buttonLinkFont.Size = new System.Drawing.Size(95, 23);
             this.buttonLinkFont.TabIndex = 14;
@@ -828,7 +836,7 @@
             // 
             // buttonAttributeFont
             // 
-            this.buttonAttributeFont.Location = new System.Drawing.Point(6, 67);
+            this.buttonAttributeFont.Location = new System.Drawing.Point(6, 79);
             this.buttonAttributeFont.Name = "buttonAttributeFont";
             this.buttonAttributeFont.Size = new System.Drawing.Size(95, 23);
             this.buttonAttributeFont.TabIndex = 13;
@@ -853,7 +861,7 @@
             this.RtfExample.Location = new System.Drawing.Point(139, 35);
             this.RtfExample.Name = "RtfExample";
             this.RtfExample.ReadOnly = true;
-            this.RtfExample.Size = new System.Drawing.Size(195, 87);
+            this.RtfExample.Size = new System.Drawing.Size(245, 111);
             this.RtfExample.TabIndex = 11;
             this.RtfExample.Text = "";
             // 
@@ -942,7 +950,7 @@
             // buttonReset
             // 
             this.buttonReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonReset.Location = new System.Drawing.Point(266, 447);
+            this.buttonReset.Location = new System.Drawing.Point(316, 447);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(106, 23);
             this.buttonReset.TabIndex = 3;
@@ -950,12 +958,22 @@
             this.buttonReset.UseVisualStyleBackColor = true;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
+            // iconsList
+            // 
+            this.iconsList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("iconsList.ImageStream")));
+            this.iconsList.TransparentColor = System.Drawing.Color.Transparent;
+            this.iconsList.Images.SetKeyName(0, "tab_application.ico");
+            this.iconsList.Images.SetKeyName(1, "tab_browser.ico");
+            this.iconsList.Images.SetKeyName(2, "tab_crawler.ico");
+            this.iconsList.Images.SetKeyName(3, "tab_rtf.ico");
+            this.iconsList.Images.SetKeyName(4, "tab_wordscounter.ico");
+            // 
             // SettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(384, 482);
+            this.ClientSize = new System.Drawing.Size(434, 482);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonSaveAndExit);
@@ -963,8 +981,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(400, 520);
-            this.MinimumSize = new System.Drawing.Size(400, 520);
+            this.MaximumSize = new System.Drawing.Size(450, 520);
+            this.MinimumSize = new System.Drawing.Size(450, 520);
             this.Name = "SettingsDialog";
             this.Text = "Settings";
             this.tabControl.ResumeLayout(false);
@@ -1069,5 +1087,6 @@
         private System.Windows.Forms.Button buttonAttributeFont;
         private System.Windows.Forms.Button buttonTextFont;
         private System.Windows.Forms.RichTextBox RtfExample;
+        private System.Windows.Forms.ImageList iconsList;
     }
 }
