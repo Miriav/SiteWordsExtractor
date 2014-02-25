@@ -109,7 +109,7 @@ namespace SiteWordsExtractor
         private void OnAttribute(object sender, string value)
         {
             // make sure attributes are on a seperate paragraph
-            m_rtf.AppendGrayText(value);
+            m_rtf.AppendAttributeText(value);
             m_rtf.StartNewParagraph();
             m_wordsCount += m_wordsCounter.CountWords(value);
             log.Debug("m_wordsCount=" + m_wordsCount.ToString());

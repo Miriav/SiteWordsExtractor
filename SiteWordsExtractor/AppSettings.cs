@@ -71,7 +71,7 @@ namespace SiteWordsExtractor
                 }
             }
 
-            public string RtfReportBaseFilename = "report_";
+            public string RtfReportBaseFilename = "pages_";
             public int RtfNumberOfPagesInReport = 100;
             public int SpaceAfterParagraph = 6;
 
@@ -89,14 +89,5 @@ namespace SiteWordsExtractor
 
         // global singleton application settings accessible from all modules
         public static AppSettings Settings = new AppSettings();
-
-        #region Application Settings
-
-        // List of not allowed file extensions
-        // TODO: remove list
-        public string fileExt = ".jpg,.png,.gif,.zip,.pdf";
-        
-        #endregion
-
     }
 }

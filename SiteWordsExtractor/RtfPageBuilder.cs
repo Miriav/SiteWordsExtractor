@@ -12,15 +12,13 @@ namespace SiteWordsExtractor
 {
     class RtfPageBuilder
     {
+        private const int TEXT_INDEX = 1;
+        private const int ATTRIBUTE_INDEX = 2;
+        private const int HYPERLINK_INDEX = 3;
+
         private string m_strFilepath;
         private RtfDocument m_doc;
         private RtfFormattedParagraph m_currParagraph;
-
-        private int m_defaultFontIndex = 1;
-        private int m_defaultFontSize = 12;
-        private RtfTextAlign m_defaultAlignment = RtfTextAlign.Left;
-        private int m_defaultColorIndex = 1;
-        private float m_defaultSpaceAfter = 6f;
 
         public RtfDocument RtfDoc
         {
@@ -32,14 +30,21 @@ namespace SiteWordsExtractor
             m_strFilepath = filepath;
             m_doc = new RtfDocument();
             m_currParagraph = null;
-            m_doc.ColorTable.Add(new RtfColor(Color.Black));
-            m_doc.ColorTable.Add(new RtfColor(Color.Gray));
-            m_doc.ColorTable.Add(new RtfColor(Color.Blue));
+
+            // resize font table
+            m_doc.FontTable.Add(new RtfFont(AppSettings.Settings.Rtf.TextFont.Name));
+            m_doc.FontTable.Add(new RtfFont(AppSettings.Settings.Rtf.AttributeFont.Name));
+            m_doc.FontTable.Add(new RtfFont(AppSettings.Settings.Rtf.HyperlinkFont.Name));
+
+            // resize color table
+            m_doc.ColorTable.Add(new RtfColor(ColorTranslator.FromHtml(AppSettings.Settings.Rtf.TextFont.Color)));
+            m_doc.ColorTable.Add(new RtfColor(ColorTranslator.FromHtml(AppSettings.Settings.Rtf.AttributeFont.Color)));
+            m_doc.ColorTable.Add(new RtfColor(ColorTranslator.FromHtml(AppSettings.Settings.Rtf.HyperlinkFont.Color)));
 
             StartNewParagraph();
         }
 
-        public void StartNewParagraph(int fontIndex, int fontSize, RtfTextAlign alignment, int colorIndex, float spaceAfterPoints)
+        public void StartNewParagraph(int fontIndex, float fontSize, RtfTextAlign alignment, int colorIndex, float spaceAfterPoints)
         {
             CloseCurrentParagraph();
 
@@ -52,7 +57,7 @@ namespace SiteWordsExtractor
 
         public void StartNewParagraph()
         {
-            StartNewParagraph(m_defaultFontIndex, m_defaultFontSize, m_defaultAlignment, m_defaultColorIndex, m_defaultSpaceAfter);
+            StartNewParagraph(TEXT_INDEX, AppSettings.Settings.Rtf.TextFont.Size, RtfTextAlign.Left, TEXT_INDEX, AppSettings.Settings.Rtf.SpaceAfterParagraph);
         }
 
         public void CloseCurrentParagraph()
@@ -70,29 +75,49 @@ namespace SiteWordsExtractor
         public void AppendText(string text)
         {
             AddSpaceIfNeeded();
-            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Regular, 1);
+
+            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Regular);
+            formattedText.FontIndex = TEXT_INDEX;
+            formattedText.TextColorIndex = TEXT_INDEX;
+            formattedText.FontSize = AppSettings.Settings.Rtf.TextFont.Size;
+
             m_currParagraph.AppendText(formattedText);
         }
 
         public void AppendBoldText(string text)
         {
             AddSpaceIfNeeded();
-            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Bold, 1);
+
+            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Bold);
+            formattedText.FontIndex = TEXT_INDEX;
+            formattedText.TextColorIndex = TEXT_INDEX;
+            formattedText.FontSize = AppSettings.Settings.Rtf.TextFont.Size;
+
             m_currParagraph.AppendText(formattedText);
         }
 
-        public void AppendGrayText(string text)
+        public void AppendAttributeText(string text)
         {
             AddSpaceIfNeeded();
-            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Regular, 2);
+
+            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Regular);
+            formattedText.FontIndex = ATTRIBUTE_INDEX;
+            formattedText.TextColorIndex = ATTRIBUTE_INDEX;
+            formattedText.FontSize = AppSettings.Settings.Rtf.AttributeFont.Size;
+
             m_currParagraph.AppendText(formattedText);
         }
 
         public void AppendHyperlink(string url, string text)
         {
             AddSpaceIfNeeded();
-            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Underline, 3);
+
+            RtfFormattedText formattedText = new RtfFormattedText(text, RtfCharacterFormatting.Regular);
+            formattedText.FontIndex = HYPERLINK_INDEX;
+            formattedText.TextColorIndex = HYPERLINK_INDEX;
+            formattedText.FontSize = AppSettings.Settings.Rtf.HyperlinkFont.Size;
             RtfHyperlink hyperlink = new RtfHyperlink(url, formattedText);
+
             m_currParagraph.AppendText(hyperlink);
         }
 
