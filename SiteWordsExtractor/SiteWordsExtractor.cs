@@ -79,12 +79,10 @@ namespace SiteWordsExtractor
 
 
             AppSettings.Settings = AppSettingsStorage.Load();
-            //m_appSettings = AppSettingsStorage.Load();
             updateStatusLine("Configuration Loaded");
             progressLabel.Text = "";
             m_statsRootFolder = null;
             m_reportFolder = null;
-            //m_simpleLogger = null;
             m_htmlProcessor = new HtmlProcessor();
             m_columnSorter = new ListViewColumnSorter();
             listViewResults.ListViewItemSorter = m_columnSorter;
@@ -155,8 +153,6 @@ namespace SiteWordsExtractor
 
         private bool validateSettings()
         {
-            // TODO: validate settings
-
             string url = siteURL.Text;
             if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
             {
@@ -599,7 +595,6 @@ namespace SiteWordsExtractor
             urlPart = urlPart.Replace('|', '_');
 
 
-            // filename should be {%04d}_{%-20s}.rtf where d is "links visited" and s is the (up to) 20 first chars of the filename
             string filename = String.Format("{0:0000} {1}{2}", counter, urlPart, ext);
 
             return filename;
@@ -669,7 +664,6 @@ namespace SiteWordsExtractor
                 }
             }
 
-            //progressLabel.Text = "" + m_linksVisited + " (" + m_linksProcessed + "+" + m_linksError + ") / " + m_linksFound;
             progressLabel.Text = "" + m_linksFound + " links found. " + m_linksVisited + " visited (" + m_linksProcessed + " processed + " + m_linksError + " error)";
         }
 
@@ -695,7 +689,6 @@ namespace SiteWordsExtractor
 
         void listViewResults_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            //listViewResults.ListViewItemSorter = new ListViewItemComparer(e.Column);
             if (e.Column == m_columnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.

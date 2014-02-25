@@ -82,28 +82,6 @@ namespace SiteWordsExtractor
                     CrawlDecision shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
                     if (shouldDownloadContentDecision.Allow)
                     {
-                        /*
-                        Encoding headerEncoding = GetEncodingFromHeader(response);
-
-                        Stream s = response.GetResponseStream();
-                        MemoryStream memStream = new MemoryStream();
-                        int bytesRead;
-                        byte[] buffer = new byte[0x1000];
-                        for (bytesRead = s.Read(buffer, 0, buffer.Length); bytesRead > 0; bytesRead = s.Read(buffer, 0, buffer.Length))
-                        {
-                            memStream.Write(buffer, 0, bytesRead);
-                        }
-                        s.Close();
-
-                        string html;
-                        memStream.Position = 0;
-                        using (StreamReader r = new StreamReader(memStream, headerEncoding))
-                        {
-                            html = r.ReadToEnd().Trim();
-                            html = CheckMetaCharSetAndReEncode(headerEncoding, memStream, html);
-                        }
-                        crawledPage.RawContent = html;
-                         */
                         crawledPage.RawContent = ProcessResponse(response);
                         crawledPage.PageSizeInBytes = Encoding.UTF8.GetBytes(crawledPage.RawContent).Length;
                     }
