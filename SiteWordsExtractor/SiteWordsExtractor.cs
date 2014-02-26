@@ -469,7 +469,7 @@ namespace SiteWordsExtractor
                 return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
             }
 
-            string plainUrl = pageToCrawl.Uri.AbsolutePath.ToLower();
+            string plainUrl = pageToCrawl.Uri.PathAndQuery.ToLower();
             foreach (string pattern in m_stringsNotAllowedInUrl)
             {
                 if (plainUrl.Contains(pattern))
