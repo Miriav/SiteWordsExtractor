@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="AppSettingsStorage.cs" />
+    <Compile Include="ElementsCounter.cs" />
     <Compile Include="Html2Rtf.cs" />
     <Compile Include="HtmlProcessor.cs" />
     <Compile Include="HyperlinkEventArgs.cs" />

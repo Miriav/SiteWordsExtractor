@@ -52,6 +52,8 @@ namespace SiteWordsExtractor
         ListViewColumnSorter m_columnSorter;
         List<RtfDocument> m_allDocuments;
         int m_globalWordsCounter;
+
+        ElementsCounter m_ElementsCounter;
         
         #endregion
         
@@ -83,6 +85,7 @@ namespace SiteWordsExtractor
             progressLabel.Text = "";
             m_statsRootFolder = null;
             m_reportFolder = null;
+            m_ElementsCounter = null;
             m_htmlProcessor = new HtmlProcessor();
             m_columnSorter = new ListViewColumnSorter();
             listViewResults.ListViewItemSorter = m_columnSorter;
@@ -196,6 +199,7 @@ namespace SiteWordsExtractor
             }
 
             m_allDocuments = new List<RtfDocument>();
+            m_ElementsCounter = new ElementsCounter(m_htmlProcessor);
 
             m_backgroundWorker = new BackgroundWorker();
             m_backgroundWorker.DoWork += new DoWorkEventHandler(doWork);
@@ -212,6 +216,10 @@ namespace SiteWordsExtractor
             log.Info(progressLabel.Text);
 
             createGlobalRtfReport();
+
+            string csvFilepath = m_reportFolder + "elements." + AppSettings.Settings.Application.StatisticsFilename;
+            m_ElementsCounter.SaveAsCSV(csvFilepath);
+            m_ElementsCounter = null;
 
             // invalidate the reports folder
             m_statsRootFolder = null;
