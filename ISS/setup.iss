@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Site Words Extractor"
-#define MyAppVersion "0.9.1.0"
+#define MyAppVersion "1.0.0.0"
 #define MyAppPublisher "Hever Translators"
 #define MyAppURL "http://www.translatorspool.com/"
 #define MyAppExeName "SiteWordsExtractor.exe"
@@ -26,8 +26,6 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf32}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-;OutputDir=C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug
-;OutputDir={#MyDistFolder}
 OutputDir={#MyProjectFolder}\ISS
 OutputBaseFilename=SiteWordsExtractorSetup
 Compression=lzma
@@ -44,14 +42,14 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Name: {app}; Permissions: everyone-full
 
 [Files]
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\SiteWordsExtractor.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\Abot.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\AutoMapper.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\CsQuery.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\HtmlAgilityPack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\Rtf.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Work\My\SiteWordsExtractor\SiteWordsExtractor\bin\Debug\settings.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\SiteWordsExtractor.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\Abot.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\AutoMapper.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\CsQuery.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\HtmlAgilityPack.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\log4net.xml"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\Rtf.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 Source: "C:\Work\My\SiteWordsExtractor\ExternalLib\dotNetFx4.5_WebInstaller.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Check: not IsRequiredDotNetDetected 
@@ -129,7 +127,7 @@ end;
 function InitializeSetup(): Boolean;
 begin
     if not IsDotNetDetected('v4\Full', 0) then begin
-        MsgBox('{#MyAppName} requires Microsoft .NET Framework 4.5 Client Profile.'#13#13
+        MsgBox('{#MyAppName} requires Microsoft .NET Framework 4.5.1 Client Profile.'#13#13
           'The installer will attempt to install it', mbInformation, MB_OK);        
     end;
     
