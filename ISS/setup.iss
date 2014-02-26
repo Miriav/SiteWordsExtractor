@@ -50,6 +50,7 @@ Source: "{#MyDistFolder}\HtmlAgilityPack.dll"; DestDir: "{app}"; Flags: ignoreve
 Source: "{#MyDistFolder}\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyDistFolder}\log4net.xml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyDistFolder}\Rtf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyDistFolder}\NPOI.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 Source: "C:\Work\My\SiteWordsExtractor\ExternalLib\dotNetFx4.5_WebInstaller.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Check: not IsRequiredDotNetDetected 

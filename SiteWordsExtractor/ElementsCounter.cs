@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using NPOI.HSSF.UserModel;
+using NPOI.HPSF;
+using NPOI.POIFS.FileSystem;
 
 namespace SiteWordsExtractor
 {
@@ -48,38 +51,66 @@ namespace SiteWordsExtractor
         {
             OnText(sender, args.Text);
         }
-
-        public void SaveAsCSV(string csvFilepath)
+        
+        public void SaveAsXls(string xlsFilepath)
         {
-            StreamWriter csvFile;
-            try
-            {
-                csvFile = new StreamWriter(csvFilepath);
-            }
-            catch (Exception e)
-            {
-                log.Error("Failed to open csv file: " + csvFilepath + ", ERROR: " + e.ToString());
-                return;
-            }
+            HSSFWorkbook workbook = new HSSFWorkbook();
 
-            csvFile.WriteLine("Number of unique elements: " + m_elementsCount.Count);
-            csvFile.WriteLine("");
-            csvFile.WriteLine("Element,Words,Count");
-            int totalWords = 0;
-            int totalElements = 0;
+            //create a entry of DocumentSummaryInformation
+            DocumentSummaryInformation dsi = PropertySetFactory.CreateDocumentSummaryInformation();
+            dsi.Company = "Hever Translations";
+            workbook.DocumentSummaryInformation = dsi;
+
+            //create a entry of SummaryInformation
+            SummaryInformation si = PropertySetFactory.CreateSummaryInformation();
+            si.Subject = "Statistics - auto generated file";
+            workbook.SummaryInformation = si;
+
+            HSSFSheet sheet = (HSSFSheet)workbook.CreateSheet("statistics");
+
+            NPOI.SS.UserModel.IRow headerRow = sheet.CreateRow(0);
+            headerRow.CreateCell(0).SetCellValue("Text");
+            headerRow.CreateCell(1).SetCellValue("Words in Text");
+            headerRow.CreateCell(2).SetCellValue("Instances of Text");
+            //HSSFFont headerFont = workbook.CreateFont();
+            NPOI.SS.UserModel.IFont headerFont = workbook.CreateFont();
+            headerFont.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+            headerRow.Cells[0].CellStyle = workbook.CreateCellStyle();
+            headerRow.Cells[0].CellStyle.SetFont(headerFont);
+            headerRow.Cells[1].CellStyle = workbook.CreateCellStyle();
+            headerRow.Cells[1].CellStyle.SetFont(headerFont);
+            headerRow.Cells[2].CellStyle = workbook.CreateCellStyle();
+            headerRow.Cells[2].CellStyle.SetFont(headerFont);
+
+            int totalWordsInText = 0;
+            int totalInstances = 0;
+            int rowNumber = 0;
             foreach (KeyValuePair<string, int> kvp in m_elementsCount)
             {
-                string element = kvp.Key;
+                string text = kvp.Key;
                 int count = kvp.Value;
                 int wordsCount = m_elementsWordCount[kvp.Key];
-                csvFile.WriteLine("\"'" + element + "\"," + wordsCount.ToString() + "," + count.ToString());
 
-                totalElements += count;
-                totalWords += wordsCount;
+                totalWordsInText += wordsCount;
+                totalInstances += count;
+
+                rowNumber++;
+                NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowNumber);
+                row.CreateCell(0).SetCellValue(text);
+                row.CreateCell(1).SetCellValue(wordsCount);
+                row.CreateCell(2).SetCellValue(count);
             }
-            csvFile.WriteLine("Total Words: " + totalWords.ToString());
-            csvFile.WriteLine("Total Elements: " + totalElements.ToString());
-            csvFile.Close();
+            rowNumber++;
+            rowNumber++;
+            sheet.CreateRow(rowNumber).CreateCell(0).SetCellValue("Total words: " + totalWordsInText.ToString());
+            rowNumber++;
+            sheet.CreateRow(rowNumber).CreateCell(0).SetCellValue("Total instances: " + totalInstances.ToString());
+
+            sheet.CreateFreezePane(0, 1, 0, 1);
+
+            FileStream file = new FileStream(xlsFilepath, FileMode.Create);
+            workbook.Write(file);
+            file.Close();
         }
     }
 }

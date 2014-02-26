@@ -217,8 +217,7 @@ namespace SiteWordsExtractor
 
             createGlobalRtfReport();
 
-            string csvFilepath = m_reportFolder + "elements." + AppSettings.Settings.Application.StatisticsFilename;
-            m_ElementsCounter.SaveAsCSV(csvFilepath);
+            m_ElementsCounter.SaveAsXls(m_reportFolder + AppSettings.Settings.Application.StatisticsFilename + ".xls");
             m_ElementsCounter = null;
 
             // invalidate the reports folder

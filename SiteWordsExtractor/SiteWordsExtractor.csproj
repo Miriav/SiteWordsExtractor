@@ -54,6 +54,9 @@
     <Reference Include="log4net">
       <HintPath>..\ExternalLib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\ExternalLib\NPOI.dll</HintPath>
+    </Reference>
     <Reference Include="Rtf">
       <HintPath>..\ExternalLib\Rtf.dll</HintPath>
     </Reference>
