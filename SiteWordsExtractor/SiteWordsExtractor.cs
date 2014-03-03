@@ -457,8 +457,12 @@ namespace SiteWordsExtractor
             try
             {
                 log.Debug("checking validity of url: " + pageToCrawl.Uri.AbsolutePath);
-                string decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
-                if (!Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
+                //string decodedUrl = WebUtility.UrlDecode(pageToCrawl.Uri.AbsolutePath);
+                //if (!Uri.IsWellFormedUriString(decodedUrl, UriKind.RelativeOrAbsolute))
+                //{
+                //    return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
+                //}
+                if (!Uri.IsWellFormedUriString(pageToCrawl.Uri.AbsolutePath, UriKind.RelativeOrAbsolute))
                 {
                     return new CrawlDecision { Allow = false, Reason = "Url is malformed" };
                 }
