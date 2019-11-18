@@ -44,7 +44,7 @@ namespace SiteWordsExtractor
             AllHtmlTags += "mark,menu,meta,meter,nav,noframes,noscript,object,ol,optgroup,";
             AllHtmlTags += "option,output,p,param,pre,progress,q,rp,rt,ruby,s,samp,script,";
             AllHtmlTags += "section,select,small,source,span,strike,strong,style,sub,summary,";
-            AllHtmlTags += "sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr";
+            AllHtmlTags += "sup,table,tbody,td,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr,footer";
         }
 
         private void UpdateAllHtmlTags()

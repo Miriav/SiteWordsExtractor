@@ -23,7 +23,7 @@ namespace SiteWordsExtractor
         {
             public string ParagraphTags = "p,br,dl,div,h1,h2,h3,h4,h5,h6,li,ul,ol,table,tr,td,th,tbody,thead";
             public string BoldTextTags = "b,em,strong";
-            public string IgnoredTags = "script,style,#comment";
+            public string IgnoredTags = "script,style,#comment,footer";
             public string InputTags = "input,textarea";
             public string HyperlinkTags = "a";
             public string Attributes = "value,alt,title";
